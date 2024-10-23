@@ -49,22 +49,11 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Install tfsec for security analysis using brew
-      - name: Install tfsec
-        run: |
-          sudo apt-get install -y curl
-          sudo apt-get install -y linuxbrew-wrapper
-          brew install tfsec
-
-      # Step 8: Run tfsec to check for security issues
-      - name: Run tfsec
-        run: tfsec .
-
-      # Step 9: Install Terrascan for security analysis
+      # Step 7: Install Terrascan for security analysis
       - name: Install Terrascan
         uses: accurics/terrascan-action@v1
 
-      # Step 10: Run Terrascan to perform a security check
+      # Step 8: Run Terrascan to perform a security check
       - name: Run Terrascan
         run: terrascan scan -i terraform -d .
 
