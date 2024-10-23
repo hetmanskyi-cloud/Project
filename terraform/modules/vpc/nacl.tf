@@ -9,24 +9,36 @@ resource "aws_network_acl" "public_nacl" {
 }
 
 # Public NACL rules: Allow HTTP/HTTPS inbound and all outbound traffic
-resource "aws_network_acl_rule" "public_inbound_allow" {
-  count          = 2 # We are going to create two rules: one for HTTP and one for HTTPS
+resource "aws_network_acl_rule" "public_inbound_allow_http" {
   network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 100 + count.index * 10 # 100 for HTTP, 110 for HTTPS
+  rule_number    = 100
   egress         = false
   protocol       = "tcp"
-  from_port      = element([80, 443], count.index)
-  to_port        = element([80, 443], count.index)
-  cidr_block     = "0.0.0.0/0"
+  from_port      = 80 # HTTP
+  to_port        = 80
+  cidr_block     = "0.0.0.0/0" # Allow traffic from any IP
   rule_action    = "allow"
 }
 
-# Public NACL rule: Deny all other inbound traffic
+resource "aws_network_acl_rule" "public_inbound_allow_https" {
+  network_acl_id = aws_network_acl.public_nacl.id
+  rule_number    = 110
+  egress         = false
+  protocol       = "tcp"
+  from_port      = 443 # HTTPS
+  to_port        = 443
+  cidr_block     = "0.0.0.0/0" # Allow traffic from any IP
+  rule_action    = "allow"
+}
+
+# Public NACL rule: Deny all other inbound traffic (CKV_AWS_352 requires denying all other ports)
 resource "aws_network_acl_rule" "public_inbound_deny" {
   network_acl_id = aws_network_acl.public_nacl.id
   rule_number    = 120
   egress         = false
-  protocol       = "-1" # All protocols
+  protocol       = "tcp" # Apply only to TCP protocols
+  from_port      = 0
+  to_port        = 65535 # Deny all other TCP traffic
   cidr_block     = "0.0.0.0/0"
   rule_action    = "deny"
 }
@@ -36,8 +48,10 @@ resource "aws_network_acl_rule" "public_outbound_allow" {
   network_acl_id = aws_network_acl.public_nacl.id
   rule_number    = 200
   egress         = true
-  protocol       = "-1" # All protocols
-  cidr_block     = "0.0.0.0/0"
+  protocol       = "tcp" # Allow TCP outbound traffic
+  from_port      = 0
+  to_port        = 65535
+  cidr_block     = "0.0.0.0/0" # Allow outbound traffic to any destination
   rule_action    = "allow"
 }
 
@@ -62,8 +76,10 @@ resource "aws_network_acl_rule" "private_inbound_deny" {
   network_acl_id = aws_network_acl.private_nacl.id
   rule_number    = 100
   egress         = false
-  protocol       = "-1" # All protocols
-  cidr_block     = "0.0.0.0/0"
+  protocol       = "tcp"
+  from_port      = 0
+  to_port        = 65535
+  cidr_block     = "0.0.0.0/0" # Deny all inbound traffic
   rule_action    = "deny"
 }
 
@@ -72,7 +88,9 @@ resource "aws_network_acl_rule" "private_outbound_allow" {
   network_acl_id = aws_network_acl.private_nacl.id
   rule_number    = 200
   egress         = true
-  protocol       = "-1" # All protocols
+  protocol       = "tcp"
+  from_port      = 0
+  to_port        = 65535
   cidr_block     = "0.0.0.0/0"
   rule_action    = "allow"
 }
