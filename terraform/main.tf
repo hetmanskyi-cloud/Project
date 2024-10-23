@@ -11,3 +11,4 @@ module "vpc" {
   availability_zone_private_1 = var.availability_zone_private_1
   availability_zone_private_2 = var.availability_zone_private_2
 }
+# Trigger GitHub Actions
