@@ -49,13 +49,22 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Install Checkov for security analysis
-      - name: Install Checkov
-        run: pip install checkov
+      # Step 7: Install tfsec for security analysis
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
 
-      # Step 8: Run Checkov to perform a security check
-      - name: Run Checkov
-        run: checkov -d .
+      # Step 8: Run tfsec to check for security issues
+      - name: Run tfsec
+        run: tfsec .
+
+      # Step 9: Install Terrascan for security analysis
+      - name: Install Terrascan
+        uses: accurics/terrascan-action@v1
+
+      # Step 10: Run Terrascan to perform a security check
+      - name: Run Terrascan
+        run: terrascan scan -i terraform -d .
 
   # Job for manual approval before proceeding
   approval:

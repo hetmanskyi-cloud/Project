@@ -10,8 +10,8 @@ resource "aws_kms_key" "log_encryption_key" {
 # Create CloudWatch log group for VPC Flow Logs
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
   name              = "/aws/vpc/flow-logs"
-  retention_in_days = 365                                # Retain logs for 365 days (1 year)
-  kms_key_id        = aws_kms_key.log_encryption_key.arn # Encrypt logs using KMS key
+  retention_in_days = 365                                # Retain logs for 365 days (1 year) for Production
+  kms_key_id        = aws_kms_key.log_encryption_key.arn # Add KMS key for encryption
 
   tags = {
     Name        = "vpc-flow-logs"
