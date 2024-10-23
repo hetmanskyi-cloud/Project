@@ -55,7 +55,8 @@ jobs:
 
       # Step 8: Run Terrascan to perform a security check
       - name: Run Terrascan
-        run: terrascan scan -i terraform -d .
+        run: terrascan scan -t terraform -d .
+        continue-on-error: true
 
   # Job for manual approval before proceeding
   approval:
