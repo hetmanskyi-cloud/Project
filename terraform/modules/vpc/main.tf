@@ -13,7 +13,7 @@ resource "aws_vpc" "dev_vpc" {
 resource "aws_subnet" "public_subnet" {
   vpc_id                  = aws_vpc.dev_vpc.id           # Reference the VPC by its ID
   cidr_block              = var.public_subnet_cidr_block # CIDR block for the subnet
-  map_public_ip_on_launch = true                         # Automatically assign public IP addresses to instances in this subnet
+  map_public_ip_on_launch = false                        # Do not automatically assign public IP addresses to instances in this subnet
   availability_zone       = var.availability_zone_public # Availability zone for the subnet
 
   tags = {
