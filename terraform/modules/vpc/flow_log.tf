@@ -1,6 +1,7 @@
-# Create KMS key for encryption
+# Create KMS key for encryption with key rotation enabled
 resource "aws_kms_key" "log_encryption_key" {
-  description = "KMS key for encrypting CloudWatch logs"
+  description         = "KMS key for encrypting CloudWatch logs"
+  enable_key_rotation = true # Enable automatic key rotation every 365 days
   tags = {
     Name        = "vpc-log-kms-key"
     Environment = "dev"
@@ -31,3 +32,4 @@ resource "aws_flow_log" "vpc_flow_log" {
     Environment = "dev"
   }
 }
+
