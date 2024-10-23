@@ -1,7 +1,18 @@
+# Create KMS key for encryption
+resource "aws_kms_key" "log_encryption_key" {
+  description = "KMS key for encrypting CloudWatch logs"
+  tags = {
+    Name        = "vpc-log-kms-key"
+    Environment = "dev"
+  }
+}
+
 # Create CloudWatch log group for VPC Flow Logs
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
   name              = "/aws/vpc/flow-logs"
-  retention_in_days = 7 # Retain logs for 7 days in dev environment. For production, consider 30-90 days.
+  retention_in_days = 365                                # Retain logs for 365 days (1 year)
+  kms_key_id        = aws_kms_key.log_encryption_key.arn # Encrypt logs using KMS key
+
   tags = {
     Name        = "vpc-flow-logs"
     Environment = "dev"
