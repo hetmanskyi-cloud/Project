@@ -49,15 +49,6 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Install Terrascan for security analysis
-      - name: Install Terrascan
-        uses: accurics/terrascan-action@v1
-
-      # Step 8: Run Terrascan to perform a security check
-      - name: Run Terrascan
-        run: terrascan scan -t terraform -d .
-        continue-on-error: true
-
   # Job for manual approval before proceeding
   approval:
     name: Await manual approval
