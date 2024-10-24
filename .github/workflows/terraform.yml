@@ -52,7 +52,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y golang
           go install github.com/aquasecurity/tfsec/cmd/tfsec@v1.28.2
-          export PATH=$PATH:/home/runner/go/bin
+          echo 'export PATH=$PATH:/home/runner/go/bin' >> $GITHUB_ENV
 
       # Step 8: Run tfsec to check for security issues
       - name: Run tfsec
