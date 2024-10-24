@@ -1,15 +1,12 @@
 name: Terraform CI with Trivy and TFLint
 
 on:
-  # Trigger the workflow on push to the main branch
   push:
     branches:
       - main
-  # Trigger the workflow on pull request to the main branch
   pull_request:
     branches:
       - main
-  # Enable manual workflow run
   workflow_dispatch:
 
 jobs:
@@ -28,32 +25,32 @@ jobs:
         with:
           terraform_version: 1.9.8
 
-      # Step 3: Run terraform fmt to ensure proper code formatting
+      # Step 3: Run terraform fmt
       - name: Run terraform fmt
         run: terraform fmt -check -recursive
-        continue-on-error: true  # Continue even if formatting fails
+        continue-on-error: true
 
       # Step 4: Validate Terraform configuration
       - name: Run terraform validate
         run: terraform validate
-        continue-on-error: true  # Continue even if validation fails
+        continue-on-error: true
 
       # Step 5: Install TFLint for static analysis
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      # Step 6: Run TFLint to lint the Terraform configuration
+      # Step 6: Run TFLint
       - name: Run TFLint
         run: tflint --init && tflint
-        continue-on-error: true  # Continue even if linting fails
+        continue-on-error: true
 
-      # Step 7: Install Trivy for security analysis
-      - name: Install Trivy
-        run: |
-          curl -sfL https://aquasecurity.github.io/trivy-repo/install.sh | sudo bash
-
-      # Step 8: Run Trivy to perform a security check
+      # Step 7: Run Trivy using official GitHub Action
       - name: Run Trivy config scan
-        run: trivy config --skip-policy "aws/rds/disable_cluster_skip_final_snapshot" --skip-policy "aws/rds/enable_cluster_deletion_protection" .
-        continue-on-error: true  # Continue even if Trivy finds issues
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: config
+          ignore-policy: |
+            aws/rds/disable_cluster_skip_final_snapshot
+            aws/rds/enable_cluster_deletion_protection
+        continue-on-error: true
