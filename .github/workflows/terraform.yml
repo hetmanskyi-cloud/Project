@@ -49,11 +49,13 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Install and run Trivy for security analysis
+      # Step 7: Install Trivy for security analysis
       - name: Install Trivy
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+          sudo apt-get install -y wget
+          wget https://github.com/aquasecurity/trivy/releases/download/v0.41.0/trivy_0.41.0_Linux-64bit.deb
+          sudo dpkg -i trivy_0.41.0_Linux-64bit.deb
 
+      # Step 8: Run Trivy for IaC scan
       - name: Run Trivy for IaC scan
-        run: |
-          ./trivy iac --security-checks config .
+        run: trivy iac --security-checks config .
