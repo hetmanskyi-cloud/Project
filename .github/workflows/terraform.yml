@@ -1,4 +1,4 @@
-name: Terraform CI with TFLint and tfsec
+name: 'Terraform GitHub Actions'
 
 on:
   push:
@@ -7,47 +7,42 @@ on:
   pull_request:
     branches:
       - main
-  workflow_dispatch:
 
 jobs:
   terraform:
-    name: Validate and Lint Terraform
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository code using the latest version of the action
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Step 2: Setup Terraform CLI using the latest version of the action
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.8
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.9.8
 
-      # Step 3: Run terraform fmt to ensure proper code formatting
-      - name: Run terraform fmt
-        run: terraform fmt -check -recursive
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      # Step 4: Validate Terraform configuration for syntax errors
-      - name: Run terraform validate
-        run: terraform validate
+    - name: TFLint
+      run: tflint
 
-      # Step 5: Install TFLint for static analysis
-      - name: Install TFLint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+    - name: Install tfsec
+      run: |
+        curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install-linux.sh | bash
 
-      # Step 6: Run TFLint to lint the Terraform configuration
-      - name: Run TFLint
-        run: tflint --init && tflint
+    - name: tfsec
+      run: tfsec
 
-      # Step 7: Install tfsec via Go (Triat version)
-      - name: Install tfsec via Go
-        run: |
-          go install github.com/tfsec/tfsec@latest
-          export PATH=$PATH:/home/runner/go/bin
+    - name: Terraform Init
+      run: terraform init
 
-      # Step 8: Run tfsec to perform a security check
-      - name: Run tfsec
-        run: tfsec .
+    - name: Terraform Format
+      run: terraform fmt -check
+
+    - name: Terraform Validate
+      run: terraform validate
+
+    - name: Terraform Plan
+      run: terraform plan
