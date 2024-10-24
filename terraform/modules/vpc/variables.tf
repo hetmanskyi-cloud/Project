@@ -39,3 +39,9 @@ variable "availability_zone_private_2" {
   description = "The availability zone for the private subnet 2"
   type        = string
 }
+
+# AWS Account ID variable for the VPC module
+variable "aws_account_id" {
+  description = "AWS Account ID for KMS key policy"
+  type        = string
+}

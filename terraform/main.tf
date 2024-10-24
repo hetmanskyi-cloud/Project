@@ -10,5 +10,6 @@ module "vpc" {
   availability_zone_public    = var.availability_zone_public
   availability_zone_private_1 = var.availability_zone_private_1
   availability_zone_private_2 = var.availability_zone_private_2
+  aws_account_id              = var.aws_account_id
 }
 # Trigger GitHub Actions

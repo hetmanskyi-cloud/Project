@@ -1,7 +1,23 @@
-# Create KMS key for encryption with key rotation enabled
 resource "aws_kms_key" "log_encryption_key" {
   description         = "KMS key for encrypting CloudWatch logs"
-  enable_key_rotation = true # Enable automatic key rotation every 365 days
+  enable_key_rotation = true
+
+  policy = <<POLICY
+  {
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "AWS": "arn:aws:iam::${var.aws_account_id}:root"
+        },
+        "Action": "kms:*",
+        "Resource": "*"
+      }
+    ]
+  }
+  POLICY
+
   tags = {
     Name        = "vpc-log-kms-key"
     Environment = "dev"

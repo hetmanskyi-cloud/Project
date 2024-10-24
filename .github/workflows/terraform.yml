@@ -1,77 +1,59 @@
-name: Terraform CI with Security Scanning
+name: Terraform CI with Trivy
 
 # Restrict permissions for this workflow
 permissions:
   contents: read  # Only allow read access to the repository contents
 
 on:
+  # Trigger the workflow on push to the main branch
   push:
     branches:
       - main
+  # Trigger the workflow on pull request to the main branch
   pull_request:
     branches:
       - main
+  # Enable manual workflow run
   workflow_dispatch:
 
 jobs:
   terraform:
-    name: Validate, Lint, and Scan Terraform
+    name: Validate and Lint Terraform
     runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the repository code using the latest version of the action
       - name: Checkout code
         uses: actions/checkout@v4
-        continue-on-error: true
 
       # Step 2: Setup Terraform CLI using the latest version of the action
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
-        continue-on-error: true
 
       # Step 3: Run terraform fmt to ensure proper code formatting
       - name: Run terraform fmt
         run: terraform fmt -check -recursive
-        continue-on-error: true
 
       # Step 4: Validate Terraform configuration for syntax errors
       - name: Run terraform validate
         run: terraform validate
-        continue-on-error: true
 
       # Step 5: Install TFLint for static analysis
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-        continue-on-error: true
 
       # Step 6: Run TFLint to lint the Terraform configuration
       - name: Run TFLint
         run: tflint --init && tflint
-        continue-on-error: true
 
-      # Step 7: Install tfsec via Go
-      - name: Install tfsec
+      # Step 7: Install and run Trivy for security analysis
+      - name: Install Trivy
         run: |
-          sudo apt-get update
-          sudo apt-get install -y golang
-          go install github.com/aquasecurity/tfsec/cmd/tfsec@v1.28.2
-          ls /home/runner/go/bin
-        continue-on-error: true
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
 
-      # Step 8: Run tfsec to check for security issues
-      - name: Run tfsec
-        run: /home/runner/go/bin/tfsec .
-        continue-on-error: true
-
-      # Step 9: Install Checkov using pip
-      - name: Install Checkov
-        run: pip install checkov
-        continue-on-error: true
-
-      # Step 10: Run Checkov to check for security issues
-      - name: Run Checkov
-        run: checkov -d .
-        continue-on-error: true
+      - name: Run Trivy for IaC scan
+        run: |
+          ./trivy iac --security-checks config .
