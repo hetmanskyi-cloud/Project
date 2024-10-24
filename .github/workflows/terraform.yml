@@ -1,4 +1,4 @@
-name: Terraform CI with Trivy
+name: Terraform CI with TFLint and tfsec
 
 on:
   push:
@@ -11,37 +11,43 @@ on:
 
 jobs:
   terraform:
-    name: Validate and Scan Terraform
+    name: Validate and Lint Terraform
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository code using the latest version of the action
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # Step 2: Setup Terraform CLI using the latest version of the action
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.9.8
 
+      # Step 3: Run terraform fmt to ensure proper code formatting
       - name: Run terraform fmt
         run: terraform fmt -check -recursive
 
+      # Step 4: Validate Terraform configuration for syntax errors
       - name: Run terraform validate
         run: terraform validate
 
+      # Step 5: Install TFLint for static analysis
       - name: Install TFLint
         run: |
           curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
+      # Step 6: Run TFLint to lint the Terraform configuration
       - name: Run TFLint
         run: tflint --init && tflint
 
-      - name: Setup Trivy
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: config
-          scan-ref: .
-          ignore-policy: aws/rds/disable_cluster_skip_final_snapshot
-          ignore-policy: aws/rds/enable_cluster_deletion_protection
+      # Step 7: Install tfsec via Go (Triat version)
+      - name: Install tfsec via Go
+        run: |
+          go install github.com/tfsec/tfsec@latest
+          export PATH=$PATH:/home/runner/go/bin
 
-    continue-on-error: true
+      # Step 8: Run tfsec to perform a security check
+      - name: Run tfsec
+        run: tfsec .
