@@ -46,14 +46,11 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Run Bridgecrew Security Scan
-      - name: Bridgecrew Security Scan
-        uses: bridgecrewio/checkov-action@v3
-        with:
-          directory: .
+      # Step 7: Install tfsec from Aqua Security
+      - name: Install tfsec
+        run: |
+          curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install.sh | bash
 
-      # Step 8: Run Checkov from Bridgecrew for additional security checks
-      - name: Run Checkov
-        uses: bridgecrewio/checkov-action@v3
-        with:
-          directory: .
+      # Step 8: Run tfsec to check for security issues
+      - name: Run tfsec
+        run: tfsec .
