@@ -37,7 +37,7 @@ jobs:
         run: tflint --init && tflint
 
       - name: Setup Trivy
-        uses: aquasecurity/trivy-action@v0.28.0
+        uses: aquasecurity/trivy-action@master
         with:
           scan-type: config
           ignore-policy: aws/rds/disable_cluster_skip_final_snapshot,aws/rds/enable_cluster_deletion_protection
