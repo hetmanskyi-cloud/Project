@@ -21,20 +21,6 @@ jobs:
       with:
         terraform_version: 1.9.8
 
-    - name: Install TFLint
-      run: |
-        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-
-    - name: TFLint
-      run: tflint
-
-    - name: Install tfsec
-      run: |
-        curl -s https://raw.githubusercontent.com/aquasecurity/tfsec/master/scripts/install-linux.sh | bash
-
-    - name: tfsec
-      run: tfsec
-
     - name: Terraform Init
       run: terraform init
 
@@ -46,3 +32,16 @@ jobs:
 
     - name: Terraform Plan
       run: terraform plan
+
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+
+    - name: TFLint
+      run: tflint
+
+    - name: Install terraform-security-scan
+      uses: triat/terraform-security-scan@v3
+
+    - name: terraform-security-scan
+      run: terraform-security-scan
