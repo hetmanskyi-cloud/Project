@@ -58,4 +58,4 @@ jobs:
 
       # Step 8: Run Trivy for IaC scan
       - name: Run Trivy for IaC scan
-        run: trivy iac --security-checks config .
+        run: trivy config .
