@@ -40,7 +40,8 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: config
-          ignore-policy: aws/rds/disable_cluster_skip_final_snapshot,aws/rds/enable_cluster_deletion_protection
           scan-ref: .
+          ignore-policy: aws/rds/disable_cluster_skip_final_snapshot
+          ignore-policy: aws/rds/enable_cluster_deletion_protection
 
     continue-on-error: true
