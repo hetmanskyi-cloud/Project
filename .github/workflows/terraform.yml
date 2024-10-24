@@ -46,17 +46,17 @@ jobs:
       - name: Run TFLint
         run: tflint --init && tflint
 
-      # Step 7: Install tfsec via Go
+      # Step 7: Install tfsec via Go (указываем стабильную версию)
       - name: Install tfsec
         run: |
           sudo apt-get update
           sudo apt-get install -y golang
           go install github.com/aquasecurity/tfsec/cmd/tfsec@v1.28.2
-          echo 'export PATH=$PATH:/home/runner/go/bin' >> $GITHUB_ENV
+          ls /home/runner/go/bin
 
       # Step 8: Run tfsec to check for security issues
       - name: Run tfsec
-        run: tfsec .
+        run: /home/runner/go/bin/tfsec .
 
       # Step 9: Install Checkov using pip
       - name: Install Checkov
