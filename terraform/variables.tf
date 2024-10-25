@@ -53,3 +53,15 @@ variable "aws_account_id" {
   description = "AWS Account ID for KMS key policy"
   type        = string
 }
+
+# Define the environment (e.g., dev, prod)
+variable "environment" {
+  description = "Environment for the infrastructure (e.g., dev, prod)"
+  type        = string
+}
+
+# Define the name prefix for resources
+variable "name_prefix" {
+  description = "The prefix for resource names, used to differentiate environments (e.g., dev, prod)"
+  type        = string
+}

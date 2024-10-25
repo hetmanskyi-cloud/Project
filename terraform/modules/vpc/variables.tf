@@ -45,3 +45,26 @@ variable "aws_account_id" {
   description = "AWS Account ID for KMS key policy"
   type        = string
 }
+
+# Define the KMS key ARN
+variable "kms_key_arn" {
+  description = "The ARN of the KMS key for encryption"
+  type        = string
+}
+
+# Define the project name
+variable "name_prefix" {
+  description = "The name of the project for resource tagging"
+  type        = string
+}
+
+# Define the environment (e.g., dev, staging, prod)
+variable "environment" {
+  description = "The environment for the resources (e.g., dev, staging, prod)"
+  type        = string
+}
+
+variable "flow_logs_role_arn" {
+  description = "The ARN of the IAM role for VPC Flow Logs"
+  type        = string
+}

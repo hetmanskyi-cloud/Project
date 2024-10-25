@@ -13,37 +13,56 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Step 1: Checkout the code from the repository
     - name: Checkout code
       uses: actions/checkout@v4
+      # Fetch the latest version of the code
 
+    # Step 2: Setup Terraform CLI
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v3
       with:
         terraform_version: 1.9.8
 
+    # Step 3: Initialize Terraform
     - name: Terraform Init
       run: terraform init
       working-directory: ./terraform
+      # Initialize the Terraform working directory
 
+    # Step 4: Check Terraform formatting
     - name: Terraform Format
       run: terraform fmt -check
       working-directory: ./terraform
+      # Ensure all Terraform code is properly formatted
 
+    # Step 5: Validate Terraform configuration
     - name: Terraform Validate
       run: terraform validate
       working-directory: ./terraform
+      # Validate the syntax and structure of the Terraform code
 
+    # Step 6: Install TFLint for linting the Terraform code
     - name: Install TFLint
       run: |
         curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
+      # Install TFLint for static analysis of Terraform configurations
 
+    # Step 7: Run TFLint to lint the Terraform configuration
     - name: TFLint
       run: tflint
       working-directory: ./terraform
+      # Perform linting to catch issues related to Terraform best practices
 
+    # Step 8: Install terraform-security-scan
     - name: Install terraform-security-scan
       uses: triat/terraform-security-scan@v3
+      # Install the security scan tool for Terraform
 
-    - name: terraform-security-scan
-      run: terraform-security-scan
+    # Step 9: Run terraform-security-scan
+    - name: Run terraform-security-scan
+      uses: triat/terraform-security-scan@v3
+      with:
+        tfsec_version: latest
       working-directory: ./terraform
+      # Run security analysis of Terraform code using tfsec

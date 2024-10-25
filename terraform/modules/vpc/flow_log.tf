@@ -1,51 +1,44 @@
-resource "aws_kms_key" "log_encryption_key" {
-  description         = "KMS key for encrypting CloudWatch logs"
-  enable_key_rotation = true
-
-  policy = <<POLICY
-  {
-    "Version": "2012-10-17",
-    "Statement": [
-      {
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": "arn:aws:iam::${var.aws_account_id}:root"
-        },
-        "Action": "kms:*",
-        "Resource": "*"
-      }
+# Create IAM policy document for KMS permissions
+data "aws_iam_policy_document" "vpc_flow_logs_kms_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "kms:Encrypt",
+      "kms:Decrypt",
+      "kms:ReEncrypt*",
+      "kms:GenerateDataKey*",
+      "kms:DescribeKey"
     ]
-  }
-  POLICY
-
-  tags = {
-    Name        = "vpc-log-kms-key"
-    Environment = "dev"
+    principals {
+      type        = "Service"
+      identifiers = ["delivery.logs.amazonaws.com"]
+    }
+    resources = [var.kms_key_arn]
   }
 }
 
 # Create CloudWatch log group for VPC Flow Logs
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
   name              = "/aws/vpc/flow-logs"
-  retention_in_days = 365                                # Retain logs for 365 days (1 year) for Production
-  kms_key_id        = aws_kms_key.log_encryption_key.arn # Add KMS key for encryption
+  retention_in_days = 365
+  kms_key_id        = var.kms_key_arn
 
   tags = {
-    Name        = "vpc-flow-logs"
-    Environment = "dev"
+    Name        = "${var.name_prefix}-flow-logs"
+    Environment = var.environment
   }
 }
 
 # Enable VPC Flow Logs
 resource "aws_flow_log" "vpc_flow_log" {
   log_destination      = aws_cloudwatch_log_group.vpc_log_group.arn
-  traffic_type         = "ALL" # Log all traffic (ingress and egress)
-  vpc_id               = aws_vpc.dev_vpc.id
+  traffic_type         = "ALL"
+  vpc_id               = aws_vpc.vpc.id
   log_destination_type = "cloud-watch-logs"
+  iam_role_arn         = var.flow_logs_role_arn # Use the role created in IAM module
 
   tags = {
-    Name        = "vpc-flow-log"
-    Environment = "dev"
+    Name        = "${var.name_prefix}-vpc-flow-log"
+    Environment = var.environment
   }
 }
-

@@ -1,10 +1,10 @@
 # Public NACL configuration
 resource "aws_network_acl" "public_nacl" {
-  vpc_id = aws_vpc.dev_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name        = "dev-public-nacl"
-    Environment = "dev"
+    Name        = "${var.name_prefix}-public-nacl" # Dynamic name for public NACL
+    Environment = var.environment                  # Dynamic environment tag
   }
 }
 
@@ -63,11 +63,11 @@ resource "aws_network_acl_association" "public_nacl_association" {
 
 # Private NACL configuration
 resource "aws_network_acl" "private_nacl" {
-  vpc_id = aws_vpc.dev_vpc.id
+  vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name        = "dev-private-nacl"
-    Environment = "dev"
+    Name        = "${var.name_prefix}-private-nacl" # Dynamic name for private NACL
+    Environment = var.environment                   # Dynamic environment tag
   }
 }
 
@@ -97,12 +97,12 @@ resource "aws_network_acl_rule" "private_outbound_allow" {
 
 # Associate the private NACL with the first private subnet
 resource "aws_network_acl_association" "private_nacl_association_1" {
-  subnet_id      = aws_subnet.dev_private_subnet_1.id
+  subnet_id      = aws_subnet.private_subnet_1.id
   network_acl_id = aws_network_acl.private_nacl.id
 }
 
 # Associate the private NACL with the second private subnet
 resource "aws_network_acl_association" "private_nacl_association_2" {
-  subnet_id      = aws_subnet.dev_private_subnet_2.id
+  subnet_id      = aws_subnet.private_subnet_2.id
   network_acl_id = aws_network_acl.private_nacl.id
 }
