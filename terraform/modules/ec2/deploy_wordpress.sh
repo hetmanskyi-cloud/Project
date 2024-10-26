@@ -10,11 +10,11 @@ sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring ph
 }
 
 # Download and install WordPress
-cd /tmp
+cd /tmp || exit
 curl -O https://wordpress.org/latest.zip
 if ! command -v unzip &> /dev/null; then
   echo "Unzip is not installed. Attempting to install unzip."
-  sudo apt install -y unzip
+  sudo apt install -y unzip || { echo "Failed to install unzip. Exiting."; exit 1; }
 fi
 unzip latest.zip
 sudo mv wordpress /var/www/html/wordpress
@@ -77,7 +77,7 @@ sudo rm /etc/nginx/sites-enabled/default
 sudo systemctl restart nginx
 
 # Install Redis plugin for WordPress
-cd /var/www/html/wordpress/wp-content/plugins
+cd /var/www/html/wordpress/wp-content/plugins || exit
 curl -O https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip
 unzip redis-cache.latest-stable.zip
 rm redis-cache.latest-stable.zip
