@@ -1,8 +1,12 @@
-# Define the VPC CIDR block
+# --- VPC CIDR Block Configuration --- #
+
+# Define the CIDR block for the VPC
 variable "vpc_cidr_block" {
   description = "The CIDR block for the VPC"
   type        = string
 }
+
+# --- Public Subnet Configuration --- #
 
 # Define the CIDR block for the public subnet
 variable "public_subnet_cidr_block" {
@@ -16,55 +20,56 @@ variable "availability_zone_public" {
   type        = string
 }
 
-# Define the CIDR block for the private subnet 1
+# --- Private Subnet 1 Configuration --- #
+
+# Define the CIDR block for the first private subnet
 variable "private_subnet_cidr_block_1" {
-  description = "The CIDR block for the private subnet 1"
+  description = "The CIDR block for the first private subnet"
   type        = string
 }
 
-# Define the availability zone for the private subnet 1
+# Define the availability zone for the first private subnet
 variable "availability_zone_private_1" {
-  description = "The availability zone for the private subnet 1"
+  description = "The availability zone for the first private subnet"
   type        = string
 }
 
-# Define the CIDR block for the private subnet 2
+# --- Private Subnet 2 Configuration --- #
+
+# Define the CIDR block for the second private subnet
 variable "private_subnet_cidr_block_2" {
-  description = "The CIDR block for the private subnet 2"
+  description = "The CIDR block for the second private subnet"
   type        = string
 }
 
-# Define the availability zone for the private subnet 2
+# Define the availability zone for the second private subnet
 variable "availability_zone_private_2" {
-  description = "The availability zone for the private subnet 2"
+  description = "The availability zone for the second private subnet"
   type        = string
 }
 
-# AWS Account ID variable for the VPC module
+# --- AWS and Project Configuration --- #
+
+# AWS Account ID used for policies and permissions in the VPC module
 variable "aws_account_id" {
   description = "AWS Account ID for KMS key policy"
   type        = string
 }
 
-# Define the KMS key ARN
+# The ARN of the KMS key for encrypting CloudWatch log groups
 variable "kms_key_arn" {
   description = "The ARN of the KMS key for encryption"
   type        = string
 }
 
-# Define the project name
+# Prefix used for naming and tagging resources
 variable "name_prefix" {
-  description = "The name of the project for resource tagging"
+  description = "Prefix for resource names to differentiate projects or environments"
   type        = string
 }
 
-# Define the environment (e.g., dev, staging, prod)
+# Environment tag to indicate the deployment stage (e.g., dev, staging, prod)
 variable "environment" {
-  description = "The environment for the resources (e.g., dev, staging, prod)"
-  type        = string
-}
-
-variable "flow_logs_role_arn" {
-  description = "The ARN of the IAM role for VPC Flow Logs"
+  description = "Environment label for resources (e.g., dev, staging, prod)"
   type        = string
 }

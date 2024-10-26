@@ -3,12 +3,19 @@
 # Update and upgrade system packages
 sudo apt update && sudo apt upgrade -y
 
-# Install required packages: Nginx, MySQL client, PHP and other necessary extensions
-sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip
+# Install required packages: Nginx, MySQL client, PHP, unzip, and other necessary extensions
+sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip || {
+  echo "Package installation failed. Please check your package manager and network connection."
+  exit 1
+}
 
 # Download and install WordPress
 cd /tmp
 curl -O https://wordpress.org/latest.zip
+if ! command -v unzip &> /dev/null; then
+  echo "Unzip is not installed. Attempting to install unzip."
+  sudo apt install -y unzip
+fi
 unzip latest.zip
 sudo mv wordpress /var/www/html/wordpress
 
@@ -20,14 +27,13 @@ sudo chmod -R 750 /var/www/html/wordpress
 cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
 # Set WordPress environment variables for database and Redis connection
-# These should be injected via the deployment or environment variables
-DB_NAME="your_db_name"
-DB_USER="your_db_user"
-DB_PASSWORD="your_db_password"
-DB_HOST="your_rds_host_endpoint"
+DB_NAME="${DB_NAME:-default_db_name}"
+DB_USER="${DB_USER:-default_db_user}"
+DB_PASSWORD="${DB_PASSWORD:-default_db_password}"
+DB_HOST="${DB_HOST:-default_rds_host_endpoint}"
 
-REDIS_HOST="your_redis_host"
-REDIS_PORT="6379"
+REDIS_HOST="${REDIS_HOST:-default_redis_host}"
+REDIS_PORT="${REDIS_PORT:-6379}"
 
 # Update wp-config.php with the MySQL and Redis configurations
 sudo sed -i "s/database_name_here/$DB_NAME/" /var/www/html/wordpress/wp-config.php

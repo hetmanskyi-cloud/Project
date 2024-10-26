@@ -1,40 +1,43 @@
-# Output the VPC ID
+# --- VPC Outputs --- #
+
+# Output the VPC ID for reference in other modules or resources
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = aws_vpc.vpc.id
+  value       = aws_vpc.vpc.id # Reference the VPC ID
 }
 
-# Output the public subnet ID
+# --- Subnet Outputs --- #
+
+# Output the ID of the public subnet for further configurations
 output "public_subnet_id" {
   description = "The ID of the public subnet"
-  value       = aws_subnet.public_subnet.id
+  value       = aws_subnet.public_subnet.id # Reference the public subnet ID
 }
 
-# Output the private subnet 1 ID
+# Output the ID of the first private subnet for secure resource placement
 output "private_subnet_1_id" {
   description = "The ID of the first private subnet"
-  value       = aws_subnet.private_subnet_1.id
+  value       = aws_subnet.private_subnet_1.id # Reference the first private subnet ID
 }
 
-# Output the private subnet 2 ID
+# Output the ID of the second private subnet for secure resource placement
 output "private_subnet_2_id" {
   description = "The ID of the second private subnet"
-  value       = aws_subnet.private_subnet_2.id
+  value       = aws_subnet.private_subnet_2.id # Reference the second private subnet ID
 }
 
-# Output the Internet Gateway ID
+# --- Internet Gateway Outputs --- #
+
+# Output the Internet Gateway ID to configure public routing
 output "internet_gateway_id" {
   description = "The ID of the Internet Gateway"
-  value       = aws_internet_gateway.igw.id
+  value       = aws_internet_gateway.igw.id # Reference the Internet Gateway ID
 }
 
-# Output the route table ID for the public subnet
+# --- Route Table Outputs --- #
+
+# Output the public route table ID for routing configurations
 output "public_route_table_id" {
   description = "The ID of the public route table"
-  value       = aws_route_table.public_route_table.id
-}
-
-output "flow_logs_role_arn" {
-  description = "The ARN of the IAM role for VPC Flow Logs"
-  value       = var.flow_logs_role_arn
+  value       = aws_route_table.public_route_table.id # Reference the public route table ID
 }
