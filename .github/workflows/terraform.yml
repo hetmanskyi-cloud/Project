@@ -1,4 +1,4 @@
-name: 'Terraform GitHub Actions Workflow'
+name: 'Terraform GitHub Actions'
 
 on:
   push:
@@ -13,66 +13,52 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the code from the repository
-      - name: Checkout Code
-        uses: actions/checkout@v4
-        # Ensure the latest code from the repository is checked out
+    # Step 1: Checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v4
 
-      # Step 2: Setup Terraform CLI
-      - name: Setup Terraform CLI
-        uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.8
-        # Set up the Terraform CLI with a specific version
+    # Step 2: Setup Terraform CLI
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: 1.9.8
 
-      # Step 3: Initialize Terraform
-      - name: Terraform Initialization
-        run: terraform init
-        working-directory: ./terraform
-        # Initialize the Terraform working directory
+    # Step 3: Initialize Terraform
+    - name: Terraform Init
+      run: terraform init
+      working-directory: ./terraform
 
-      # Step 4: Check Terraform formatting
-      - name: Terraform Format Check
-        run: terraform fmt -check
-        working-directory: ./terraform
-        # Check Terraform files are properly formatted
+    # Step 4: Check Terraform formatting
+    - name: Terraform Format
+      run: terraform fmt -check
+      working-directory: ./terraform
 
-      # Step 5: Validate Terraform configuration
-      - name: Terraform Validation
-        run: terraform validate
-        working-directory: ./terraform
-        # Validate the Terraform configuration syntax and structure
+    # Step 5: Validate Terraform configuration
+    - name: Terraform Validate
+      run: terraform validate
+      working-directory: ./terraform
 
-      # Step 6: Install TFLint for linting the Terraform code
-      - name: Install TFLint
-        run: |
-          curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
-        # Install TFLint for Terraform best practices checks
+    # Step 6: ShellCheck for bash scripts
+    - name: ShellCheck
+      run: |
+        find ./terraform -name '*.sh' -exec shellcheck {} +
 
-      # Step 7: Run TFLint on Terraform configuration
-      - name: TFLint Linting
-        run: tflint
-        working-directory: ./terraform
-        # Run TFLint to check Terraform configuration for issues
+    # Step 7: Install TFLint for linting the Terraform code
+    - name: Install TFLint
+      run: |
+        curl -s https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash
 
-      # Step 8: Install terraform-security-scan (tfsec)
-      - name: Install tfsec for Security Scanning
-        uses: aquasecurity/tfsec-action@v1
-        with:
-          tfsec_version: latest
-        # Install tfsec for security scanning of Terraform configurations
+    # Step 8: Run TFLint to lint the Terraform configuration
+    - name: TFLint
+      run: tflint
+      working-directory: ./terraform
 
-      # Step 9: Run tfsec Security Scan
-      - name: Run tfsec Security Scan
-        run: tfsec ./terraform
-        # Run tfsec security scan on the Terraform configuration
+    # Step 9: Install terraform-security-scan (tfsec via triat)
+    - name: Install terraform-security-scan
+      uses: triat/terraform-security-scan@v3
 
-      # Step 10: Install ShellCheck for Bash Script Analysis
-      - name: Install ShellCheck
-        run: sudo apt-get install -y shellcheck
-        # Install ShellCheck to analyze bash scripts for syntax and formatting
-
-      # Step 11: Run ShellCheck on Deployment Script
-      - name: ShellCheck on deploy_wordpress.sh
-        run: shellcheck ./terraform/modules/ec2/deploy_wordpress.sh
-        # Run ShellCheck on deploy_wordpress.sh script to ensure correct syntax and formatting
+    # Step 10: Run terraform-security-scan
+    - name: Run terraform-security-scan
+      run: |
+        cd ./terraform
+        terraform-security-scan
