@@ -58,7 +58,7 @@ resource "aws_iam_role_policy" "vpc_flow_logs_policy" {
 # CloudWatch log group for VPC Flow Logs
 resource "aws_cloudwatch_log_group" "vpc_log_group" {
   name              = "/aws/vpc/flow-logs"
-  retention_in_days = 365             # Retain logs for 365 days (1 year)
+  retention_in_days = 7               # Log retention policy for development environment
   kms_key_id        = var.kms_key_arn # Enable encryption with specified KMS key
 
   tags = {

@@ -51,3 +51,66 @@ output "flow_logs_role_arn" {
   description = "The ARN of the IAM role for VPC Flow Logs"
   value       = module.flow_logs.flow_logs_role_arn # Reference to the IAM role ARN output from the Flow Logs module
 }
+
+# --- EC2 Module Outputs --- # 
+
+output "ec2_asg_name" {
+  description = "The name of the Auto Scaling Group for EC2 instances"
+  value       = module.ec2.ec2_asg_name
+}
+
+output "ec2_instance_ids" {
+  description = "The list of instance IDs in the Auto Scaling Group"
+  value       = module.ec2.ec2_instance_ids
+}
+
+output "ec2_log_group_arn" {
+  description = "The ARN of the CloudWatch Log Group for EC2 instances"
+  value       = module.ec2.ec2_log_group_arn
+}
+
+# --- S3 Module Outputs --- #
+
+# Output the ARN of the Terraform state bucket
+output "terraform_state_bucket_arn" {
+  description = "The ARN of the S3 bucket for Terraform remote state"
+  value       = module.s3.terraform_state_bucket_arn
+}
+
+# Output the name of the DynamoDB table for Terraform state locking
+output "terraform_locks_table_name" {
+  description = "The name of the DynamoDB table for Terraform state locking"
+  value       = module.s3.terraform_locks_table_name
+}
+
+# Output the ARN of the WordPress media bucket
+output "wordpress_media_bucket_arn" {
+  description = "The ARN of the S3 bucket for WordPress media storage"
+  value       = module.s3.wordpress_media_bucket_arn
+}
+
+# Output the ARN of the WordPress scripts bucket
+output "wordpress_scripts_bucket_arn" {
+  description = "The ARN of the S3 bucket for WordPress setup scripts"
+  value       = module.s3.wordpress_scripts_bucket_arn
+}
+
+# --- RDS Outputs --- #
+
+# Output the endpoint of the RDS database
+output "db_host" {
+  description = "The endpoint of the RDS database"
+  value       = module.rds.db_host
+}
+
+# Output the database name
+output "db_name" {
+  description = "The name of the RDS database"
+  value       = module.rds.db_name
+}
+
+# Output the master username for the database
+output "db_username" {
+  description = "The master username for the RDS database"
+  value       = module.rds.db_username
+}

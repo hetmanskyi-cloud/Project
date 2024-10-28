@@ -14,72 +14,168 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
-# Define the CIDR block for the public subnet
+# Define the CIDR block and availability zone for the public subnet
 variable "public_subnet_cidr_block" {
   description = "The CIDR block for the public subnet"
   type        = string
 }
 
-# Define the availability zone for the public subnet
 variable "availability_zone_public" {
   description = "The availability zone for the public subnet"
   type        = string
 }
 
-# Define the CIDR block for the private subnet 1
+# Define the CIDR block and availability zone for the private subnets
 variable "private_subnet_cidr_block_1" {
-  description = "The CIDR block for the private subnet 1"
+  description = "The CIDR block for the first private subnet"
   type        = string
 }
 
-# Define the availability zone for the private subnet 1
 variable "availability_zone_private_1" {
-  description = "The availability zone for the private subnet 1"
+  description = "The availability zone for the first private subnet"
   type        = string
 }
 
-# Define the CIDR block for the private subnet 2
 variable "private_subnet_cidr_block_2" {
-  description = "The CIDR block for the private subnet 2"
+  description = "The CIDR block for the second private subnet"
   type        = string
 }
 
-# Define the availability zone for the private subnet 2
 variable "availability_zone_private_2" {
-  description = "The availability zone for the private subnet 2"
+  description = "The availability zone for the second private subnet"
   type        = string
 }
 
 # --- AWS Account and Resource Naming --- #
 
-# AWS Account ID variable used for policies and resources
 variable "aws_account_id" {
   description = "AWS Account ID for KMS key policy"
   type        = string
 }
 
-# Define the environment (e.g., dev, prod)
 variable "environment" {
   description = "Environment for the infrastructure (e.g., dev, prod)"
   type        = string
 }
 
-# Define the name prefix for resources
 variable "name_prefix" {
   description = "The prefix for resource names, used to differentiate environments (e.g., dev, prod)"
   type        = string
 }
 
+# --- RDS Configuration --- #
+
+variable "allocated_storage" {
+  description = "Storage size in GB for the RDS instance"
+  type        = number
+}
+
+variable "instance_class" {
+  description = "Instance class for RDS"
+  type        = string
+}
+
+variable "engine" {
+  description = "Database engine for the RDS instance (e.g., MySQL, PostgreSQL)"
+  type        = string
+}
+
+variable "engine_version" {
+  description = "Database engine version"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Master username for RDS"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Master password for RDS"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+}
+
+variable "db_port" {
+  description = "Database port for MySQL RDS"
+  type        = number
+}
+
+variable "redis_host" {
+  description = "Redis host endpoint for WordPress caching"
+  type        = string
+}
+
+variable "redis_port" {
+  description = "Redis port for caching"
+  type        = number
+}
+
+variable "backup_retention_period" {
+  description = "Number of days to retain RDS backups"
+  type        = number
+}
+
+variable "backup_window" {
+  description = "Preferred window for automated RDS backups"
+  type        = string
+}
+
+variable "multi_az" {
+  description = "Enable Multi-AZ deployment for RDS high availability"
+  type        = bool
+}
+
+variable "enable_deletion_protection" {
+  description = "Enable or disable deletion protection for RDS instance"
+  type        = bool
+}
+
+variable "read_replica_count" {
+  description = "Number of read replicas for RDS"
+  type        = number
+}
+
+# --- EC2 Configuration --- #
+
+variable "ami_id" {
+  description = "The AMI ID to use for EC2 instances"
+  type        = string
+}
+
+variable "instance_type" {
+  description = "Instance type for the EC2 instances"
+  type        = string
+}
+
+variable "autoscaling_desired" {
+  description = "Desired number of instances in the Auto Scaling Group"
+  type        = number
+}
+
+variable "autoscaling_min" {
+  description = "Minimum number of instances in the Auto Scaling Group"
+  type        = number
+}
+
+variable "autoscaling_max" {
+  description = "Maximum number of instances in the Auto Scaling Group"
+  type        = number
+}
+
 # --- Monitoring Configuration --- #
 
-# Enable or disable the Internet Monitor
 variable "enable_internet_monitor" {
   description = "Enable or disable the Internet Monitor feature"
   type        = bool
   default     = false
 }
 
-# Define the percentage of traffic to monitor in the Internet Monitor
 variable "traffic_percentage" {
   description = "Percentage of traffic for monitoring"
   type        = number

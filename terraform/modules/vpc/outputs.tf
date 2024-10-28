@@ -41,3 +41,10 @@ output "public_route_table_id" {
   description = "The ID of the public route table"
   value       = aws_route_table.public_route_table.id # Reference the public route table ID
 }
+
+# --- Public Subnet CIDR Block Output --- #
+
+output "public_subnet_cidr_block" {
+  description = "The CIDR block for the public subnet"
+  value       = var.public_subnet_cidr_block
+}

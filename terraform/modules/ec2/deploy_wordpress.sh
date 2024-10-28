@@ -46,48 +46,4 @@ sudo tee -a /var/www/html/wordpress/wp-config.php > /dev/null <<EOL
 
 # Redis configuration
 define('WP_REDIS_HOST', '$REDIS_HOST');
-define('WP_REDIS_PORT', '$REDIS_PORT');
-EOL
-
-# Configure Nginx for WordPress
-sudo tee /etc/nginx/sites-available/wordpress <<EOL
-server {
-    listen 80;
-    server_name _;
-
-    root /var/www/html/wordpress;
-    index index.php index.html index.htm;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$args;
-    }
-
-    location ~ \.php\$ {
-        include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
-    }
-}
-EOL
-
-# Enable the WordPress site and disable the default Nginx site
-sudo ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/
-sudo rm /etc/nginx/sites-enabled/default
-
-# Restart Nginx to apply the changes
-sudo systemctl restart nginx
-
-# Install Redis plugin for WordPress
-cd /var/www/html/wordpress/wp-content/plugins || exit
-curl -O https://downloads.wordpress.org/plugin/redis-cache.latest-stable.zip
-unzip redis-cache.latest-stable.zip
-rm redis-cache.latest-stable.zip
-
-# Set the proper permissions for the plugin directory
-sudo chown -R www-data:www-data /var/www/html/wordpress/wp-content/plugins
-
-# Restart PHP and Nginx to apply Redis cache
-sudo systemctl restart php8.2-fpm
-sudo systemctl restart nginx
-
-# Output message
-echo "WordPress installation and configuration completed!"
+define('WP_RE
