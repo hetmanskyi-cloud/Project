@@ -126,5 +126,4 @@ variable "kms_key_arn" {
 variable "enable_monitoring" {
   description = "Enable RDS enhanced monitoring if set to true"
   type        = bool
-  default     = false
 }

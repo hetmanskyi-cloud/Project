@@ -99,6 +99,7 @@ module "rds" {
   multi_az                = var.multi_az
   deletion_protection     = var.enable_deletion_protection
   skip_final_snapshot     = var.skip_final_snapshot
+  enable_monitoring       = var.enable_monitoring
 
   # KMS key for encryption
   kms_key_arn = module.kms.kms_key_arn
