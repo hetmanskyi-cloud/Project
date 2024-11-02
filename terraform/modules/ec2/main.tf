@@ -13,7 +13,7 @@ resource "aws_launch_template" "ec2" {
   }
 
   # User data to execute the deploy_wordpress.sh script on instance launch
-  user_data = base64encode(file("${path.module}/deploy_wordpress.sh"))
+  user_data = var.user_data != "" ? base64encode(var.user_data) : null
 
   # Network interfaces configuration
   network_interfaces {

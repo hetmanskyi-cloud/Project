@@ -69,6 +69,7 @@ resource "aws_cloudwatch_log_group" "vpc_log_group" {
   # Lifecycle configuration to allow forced deletion
   lifecycle {
     prevent_destroy = false
+    ignore_changes  = [retention_in_days, kms_key_id]
   }
 
   # Dependency on IAM Role and Policy to ensure proper deletion

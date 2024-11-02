@@ -130,6 +130,7 @@ module "ec2" {
   db_port     = var.db_port
   redis_host  = var.redis_host
   redis_port  = var.redis_port
+  user_data   = file("${path.module}/scripts/deploy_wordpress.sh")
 
   # Tags and environment information
   name_prefix = var.name_prefix

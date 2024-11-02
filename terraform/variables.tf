@@ -167,6 +167,12 @@ variable "db_port" {
   type        = number
 }
 
+variable "user_data" {
+  description = "Path to the user data script for EC2"
+  type        = string
+  default     = ""
+}
+
 variable "backup_retention_period" {
   description = "Number of days to retain RDS backups"
   type        = number

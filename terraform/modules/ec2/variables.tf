@@ -99,6 +99,12 @@ variable "db_port" {
   default     = 3306
 }
 
+variable "user_data" {
+  description = "Path to the user data script for EC2"
+  type        = string
+  default     = ""
+}
+
 # --- Redis Configuration for WordPress Cache ---
 
 # Redis host endpoint for WordPress cache
