@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # --- System update and required packages installation ---
+echo "Updating system and installing required packages..."
 sudo apt update && sudo apt upgrade -y
 sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip || {
   echo "Package installation failed. Please check the connection and package availability."
@@ -8,10 +9,12 @@ sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring ph
 }
 
 # --- Download and install WordPress ---
+echo "Downloading and installing WordPress..."
 cd /tmp || exit
 curl -O https://wordpress.org/latest.zip
 unzip latest.zip
 sudo mv wordpress /var/www/html/wordpress
+rm latest.zip # Clean up
 
 # Set permissions for WordPress
 sudo chown -R www-data:www-data /var/www/html/wordpress
@@ -30,12 +33,14 @@ REDIS_HOST="${REDIS_HOST:-default_redis_host}"
 REDIS_PORT="${REDIS_PORT:-6379}"
 
 # Configure wp-config.php for database connection
+echo "Configuring wp-config.php for database connection..."
 sudo sed -i "s/database_name_here/$DB_NAME/" /var/www/html/wordpress/wp-config.php
 sudo sed -i "s/username_here/$DB_USER/" /var/www/html/wordpress/wp-config.php
 sudo sed -i "s/password_here/$DB_PASSWORD/" /var/www/html/wordpress/wp-config.php
 sudo sed -i "s/localhost/$DB_HOST/" /var/www/html/wordpress/wp-config.php
 
 # Add Redis configuration to wp-config.php
+echo "Adding Redis configuration to wp-config.php..."
 sudo tee -a /var/www/html/wordpress/wp-config.php > /dev/null <<EOL
 # Redis configuration
 define('WP_REDIS_HOST', '$REDIS_HOST');
@@ -43,10 +48,11 @@ define('WP_REDIS_PORT', $REDIS_PORT);
 define('WP_CACHE', true);
 EOL
 
-# --- Automatically detect the PHP-FPM socket path ---
-PHP_FPM_SOCK=$(find /run/php/ -name "php*-fpm.sock" | head -n 1)
+# Set secure permissions for wp-config.php
+sudo chmod 640 /var/www/html/wordpress/wp-config.php
 
 # --- Configure Nginx for WordPress ---
+echo "Configuring Nginx for WordPress..."
 sudo tee /etc/nginx/sites-available/wordpress > /dev/null <<EOL
 server {
     listen 80 default_server;
@@ -61,7 +67,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:$PHP_FPM_SOCK;
+        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
     }
 
     location ~ /\.ht {
@@ -71,9 +77,13 @@ server {
 EOL
 
 # Enable Nginx configuration and restart service
+echo "Enabling Nginx configuration and restarting the service..."
 sudo ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl restart nginx
 
 # --- Enable Nginx and PHP-FPM to start on boot ---
+echo "Enabling Nginx and PHP-FPM to start on boot..."
 sudo systemctl enable nginx
 sudo systemctl enable php8.3-fpm
+
+echo "WordPress installation and configuration complete."
