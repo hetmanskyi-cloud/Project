@@ -1,4 +1,4 @@
-# --- Naming and Environment Configuration --- #
+# --- Naming and Environment Configuration ---
 
 # Define the name prefix for resources
 variable "name_prefix" {
@@ -12,7 +12,7 @@ variable "environment" {
   type        = string
 }
 
-# --- VPC and Instance Configuration --- #
+# --- VPC and Instance Configuration ---
 
 # VPC ID to associate with the EC2 instances
 variable "vpc_id" {
@@ -26,7 +26,13 @@ variable "ami_id" {
   type        = string
 }
 
-# --- Subnet Configuration --- #
+# EC2 Root Volume Configuration
+variable "volume_size" {
+  description = "The size of the root EBS volume in GB"
+  type        = number
+}
+
+# --- Subnet Configuration ---
 
 # List of subnet IDs for launching EC2 instances
 variable "subnet_ids" {
@@ -40,7 +46,7 @@ variable "instance_type" {
   type        = string
 }
 
-# --- Auto-scaling Configuration --- #
+# --- Auto-scaling Configuration ---
 
 # Auto-scaling group desired capacity
 variable "autoscaling_desired" {
@@ -60,7 +66,7 @@ variable "autoscaling_max" {
   type        = number
 }
 
-# --- Database Configuration for WordPress --- #
+# --- Database Configuration for WordPress ---
 
 # Database name for WordPress
 variable "db_name" {
@@ -93,7 +99,7 @@ variable "db_port" {
   default     = 3306
 }
 
-# --- Redis Configuration for WordPress Cache --- #
+# --- Redis Configuration for WordPress Cache ---
 
 # Redis host endpoint for WordPress cache
 variable "redis_host" {
@@ -106,4 +112,24 @@ variable "redis_port" {
   description = "Redis port for WordPress cache"
   type        = number
   default     = 6379
+}
+
+# --- Security Configuration ---
+
+# Security Group ID for SSM endpoint
+variable "ssm_endpoint_sg_id" {
+  description = "ID of the Security Group for SSM endpoint"
+  type        = string
+}
+
+# --- Public Subnet CIDR Blocks ---
+variable "public_subnet_cidr_blocks" {
+  description = "List of CIDR blocks for the public subnets"
+  type        = list(string)
+}
+
+# SSH Key Pair Name
+variable "ssh_key_name" {
+  description = "The name of the SSH key pair to access EC2 instances"
+  type        = string
 }

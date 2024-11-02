@@ -1,43 +1,43 @@
-# --- Configuration for Internet Monitor Module --- #
+# --- Internet Monitor Module Configuration --- #
 
-# Toggle for enabling/disabling the Internet Monitor
+# Enable or disable the Internet Monitor
 variable "enable_internet_monitor" {
-  description = "Enable or disable the Internet Monitor for network monitoring" # Controls monitor creation
+  description = "Enable or disable the Internet Monitor for network traffic monitoring" # Controls monitor creation
   type        = bool
   default     = false
 }
 
-# Define traffic percentage for monitoring
+# Set the percentage of VPC traffic to monitor
 variable "traffic_percentage" {
-  description = "Percentage of traffic to monitor" # Sets the portion of network traffic to monitor
+  description = "Percentage of network traffic to monitor in Internet Monitor" # Specifies traffic monitoring intensity
   type        = number
   default     = 100
 }
 
-# --- Network Configuration --- #
+# --- Network and Region Configuration --- #
 
-# The VPC ID for which monitoring is set up
+# VPC ID associated with Internet Monitor
 variable "vpc_id" {
-  description = "VPC ID to link with the Internet Monitor" # VPC to be monitored
+  description = "The ID of the VPC to be monitored" # The VPC where Internet Monitor will track traffic
   type        = string
 }
 
-# AWS Region where resources are created
+# AWS Region where resources will be deployed
 variable "aws_region" {
-  description = "AWS region for resource creation" # Specifies resource deployment region
+  description = "AWS region for Internet Monitor resource deployment" # Region where resources are created
   type        = string
 }
 
-# --- Resource Naming and Environment Tags --- #
+# --- Naming and Environment Tags --- #
 
-# Name prefix for resources
+# Prefix to apply to resource names
 variable "name_prefix" {
-  description = "Prefix for naming resources" # Custom prefix for identifying resources
+  description = "Prefix for naming resources uniquely" # Prefix to identify resources by environment or project
   type        = string
 }
 
-# Environment for tagging purposes
+# Environment for tagging resources (e.g., dev, prod)
 variable "environment" {
-  description = "Environment tag for the resources" # Tag for environment (e.g., dev, prod)
+  description = "Environment tag for resources (e.g., dev, staging, prod)" # Tag for resource environment grouping
   type        = string
 }

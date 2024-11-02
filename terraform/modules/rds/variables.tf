@@ -1,4 +1,4 @@
-# --- RDS Module Variables --- #
+# --- Naming and Environment Variables --- #
 
 variable "name_prefix" {
   description = "Prefix for resource names"
@@ -10,6 +10,8 @@ variable "environment" {
   type        = string
 }
 
+# --- RDS Instance Configuration Variables --- #
+
 variable "allocated_storage" {
   description = "Storage size in GB for the RDS instance"
   type        = number
@@ -20,15 +22,13 @@ variable "instance_class" {
   type        = string
 }
 
-# Engine type for the RDS instance (e.g., "mysql", "postgres")
 variable "engine" {
-  description = "Database engine for the RDS instance"
+  description = "Database engine for the RDS instance (e.g., 'mysql', 'postgres')"
   type        = string
 }
 
-# Database engine version (e.g., "8.0" for MySQL, "13" for PostgreSQL)
 variable "engine_version" {
-  description = "Database engine version"
+  description = "Database engine version (e.g., '8.0' for MySQL)"
   type        = string
 }
 
@@ -48,25 +48,10 @@ variable "db_name" {
   type        = string
 }
 
-variable "vpc_security_group_ids" {
-  description = "List of VPC security group IDs for RDS access"
-  type        = list(string)
-}
-
-# List of private subnet IDs for RDS (e.g., Private Subnet 1)
-variable "subnet_ids" {
-  description = "List of private subnet IDs for RDS"
-  type        = list(string)
-}
-
-variable "backup_retention_period" {
-  description = "Number of days to retain RDS backups"
+variable "db_port" {
+  description = "Database port for RDS (e.g., 3306 for MySQL)"
   type        = number
-}
-
-variable "backup_window" {
-  description = "Preferred window for automated RDS backups"
-  type        = string
+  default     = 3306
 }
 
 variable "multi_az" {
@@ -74,41 +59,72 @@ variable "multi_az" {
   type        = bool
 }
 
+# Toggle for enabling or disabling Performance Insights
+variable "performance_insights_enabled" {
+  description = "Enable or disable Performance Insights for RDS instance"
+  type        = bool
+  default     = false
+}
+
+# --- Backup and Retention Configuration --- #
+
+variable "backup_retention_period" {
+  description = "Number of days to retain RDS backups"
+  type        = number
+}
+
+variable "backup_window" {
+  description = "Preferred window for automated RDS backups (e.g., '02:00-03:00')"
+  type        = string
+}
+
+# --- Deletion Protection and Final Snapshot --- #
+
 variable "deletion_protection" {
   description = "Enable or disable deletion protection for RDS instance"
   type        = bool
 }
 
-variable "read_replica_count" {
-  description = "Number of read replicas for RDS"
-  type        = number
+variable "skip_final_snapshot" {
+  description = "Skip final snapshot when deleting the RDS instance"
+  type        = bool
+  default     = false
 }
 
-# --- VPC ID for RDS --- #
+# --- Networking Variables --- #
 
-# The ID of the VPC where the RDS instance will be hosted
 variable "vpc_id" {
   description = "The ID of the VPC where the RDS instance is hosted"
   type        = string
 }
 
-# --- EC2 Security Group ID --- #
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs for RDS deployment"
+  type        = list(string)
+}
+
+variable "allowed_cidr_blocks" {
+  description = "List of CIDR blocks allowed to access RDS"
+  type        = list(string)
+}
+
+# --- Security Group Variables --- #
+
 variable "ec2_security_group_id" {
   description = "ID of the Security Group for EC2 instances"
   type        = string
 }
 
-# CIDR block for allowing access to the RDS database
-variable "allowed_cidr" {
-  description = "CIDR block to allow access to RDS from public subnet"
+# --- KMS Key ARN for Encryption --- #
+
+variable "kms_key_arn" {
+  description = "The ARN of the KMS key for RDS encryption"
   type        = string
 }
 
-# --- Database Port for RDS --- #
-
-# Port for the RDS database (e.g., 3306 for MySQL)
-variable "db_port" {
-  description = "Database port for RDS (e.g., 3306 for MySQL)"
-  type        = number
+# Enable or disable enhanced monitoring for RDS
+variable "enable_monitoring" {
+  description = "Enable RDS enhanced monitoring if set to true"
+  type        = bool
+  default     = false
 }
-

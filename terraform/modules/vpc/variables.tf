@@ -1,3 +1,11 @@
+# --- AWS Region Configuration --- #
+
+# AWS region where the resources will be created
+variable "region" {
+  description = "The AWS region where the resources are being deployed"
+  type        = string
+}
+
 # --- VPC CIDR Block Configuration --- #
 
 # Define the CIDR block for the VPC
@@ -6,17 +14,31 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
-# --- Public Subnet Configuration --- #
+# --- Public Subnet 1 Configuration --- #
 
-# Define the CIDR block for the public subnet
-variable "public_subnet_cidr_block" {
-  description = "The CIDR block for the public subnet"
+# Define the CIDR block for the first public subnet
+variable "public_subnet_cidr_block_1" {
+  description = "CIDR block for the first public subnet"
   type        = string
 }
 
-# Define the availability zone for the public subnet
-variable "availability_zone_public" {
-  description = "The availability zone for the public subnet"
+# Define the availability zone for the first public subnet
+variable "availability_zone_public_1" {
+  description = "The availability zone for the first public subnet"
+  type        = string
+}
+
+# --- Public Subnet 2 Configuration --- #
+
+# Define the CIDR block for the second public subnet
+variable "public_subnet_cidr_block_2" {
+  description = "CIDR block for the second public subnet"
+  type        = string
+}
+
+# Define the availability zone for the second public subnet
+variable "availability_zone_public_2" {
+  description = "The availability zone for the second public subnet"
   type        = string
 }
 

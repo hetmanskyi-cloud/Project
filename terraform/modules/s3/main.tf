@@ -1,5 +1,5 @@
-# --- S3 Bucket for Terraform State --- #
-
+# --- S3 Bucket for Terraform State ---
+# Bucket for storing Terraform state with versioning and lifecycle policies
 resource "aws_s3_bucket" "terraform_state" {
   bucket = "${lower(var.name_prefix)}-terraform-state-${random_string.suffix.result}"
 
@@ -9,41 +9,38 @@ resource "aws_s3_bucket" "terraform_state" {
   }
 }
 
-# --- Lifecycle Configuration for Terraform State Bucket --- #
-
-resource "aws_s3_bucket_lifecycle_configuration" "terraform_state_lifecycle" {
+# --- Server-Side Encryption for Terraform State Bucket ---
+# Configures default server-side encryption for the Terraform state bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "terraform_state_encryption" {
   bucket = aws_s3_bucket.terraform_state.id
 
   rule {
-    id     = "retain-versioned-states"
-    status = "Enabled"
-
-    # Expiration settings for non-current versions
-    filter {
-      prefix = "" # Apply to all objects
-    }
-
-    noncurrent_version_expiration {
-      noncurrent_days = 90 # Retain non-current versions for 90 days
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256" # AES-256 encryption
     }
   }
 }
 
-# --- Versioning Configuration for Terraform State Bucket --- #
-
+# --- Versioning Configuration for Terraform State Bucket ---
+# Enables versioning on the Terraform state bucket
 resource "aws_s3_bucket_versioning" "terraform_state_versioning" {
   bucket = aws_s3_bucket.terraform_state.id
   versioning_configuration {
-    status = "Enabled"
+    status = "Enabled" # Enable versioning to maintain history of objects
   }
 }
 
-# --- DynamoDB Table for Terraform State Locking --- #
-
+# --- DynamoDB Table for Terraform State Locking ---
+# Creates a DynamoDB table to handle state locking for Terraform
 resource "aws_dynamodb_table" "terraform_locks" {
   name         = "${lower(var.name_prefix)}-terraform-locks-${random_string.suffix.result}"
-  billing_mode = "PAY_PER_REQUEST"
+  billing_mode = "PAY_PER_REQUEST" # Pay-per-request billing
   hash_key     = "LockID"
+
+  # Enable server-side encryption for DynamoDB
+  server_side_encryption {
+    enabled = true
+  }
 
   attribute {
     name = "LockID"
@@ -56,8 +53,8 @@ resource "aws_dynamodb_table" "terraform_locks" {
   }
 }
 
-# --- S3 Bucket for WordPress Media --- #
-
+# --- S3 Bucket for WordPress Media ---
+# Bucket for storing WordPress media files with encryption and versioning
 resource "aws_s3_bucket" "wordpress_media" {
   bucket = "${lower(var.name_prefix)}-wordpress-media-${random_string.suffix.result}"
 
@@ -67,17 +64,29 @@ resource "aws_s3_bucket" "wordpress_media" {
   }
 }
 
-# --- Versioning Configuration for WordPress Media Bucket --- #
-
-resource "aws_s3_bucket_versioning" "wordpress_media_versioning" {
+# --- Server-Side Encryption for WordPress Media Bucket ---
+# Configures default server-side encryption for the WordPress media bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "wordpress_media_encryption" {
   bucket = aws_s3_bucket.wordpress_media.id
-  versioning_configuration {
-    status = "Enabled"
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256" # AES-256 encryption
+    }
   }
 }
 
-# --- S3 Bucket for WordPress Scripts --- #
+# --- Versioning Configuration for WordPress Media Bucket ---
+# Enables versioning for the WordPress media bucket to keep a history of object versions
+resource "aws_s3_bucket_versioning" "wordpress_media_versioning" {
+  bucket = aws_s3_bucket.wordpress_media.id
+  versioning_configuration {
+    status = "Enabled" # Enable versioning for object history
+  }
+}
 
+# --- S3 Bucket for WordPress Scripts ---
+# Bucket for storing setup scripts for WordPress with encryption and versioning
 resource "aws_s3_bucket" "wordpress_scripts" {
   bucket = "${lower(var.name_prefix)}-wordpress-scripts-${random_string.suffix.result}"
 
@@ -87,22 +96,33 @@ resource "aws_s3_bucket" "wordpress_scripts" {
   }
 }
 
-# --- Versioning Configuration for WordPress Scripts Bucket --- #
-
-resource "aws_s3_bucket_versioning" "wordpress_scripts_versioning" {
+# --- Server-Side Encryption for WordPress Scripts Bucket ---
+# Configures default server-side encryption for the WordPress scripts bucket
+resource "aws_s3_bucket_server_side_encryption_configuration" "wordpress_scripts_encryption" {
   bucket = aws_s3_bucket.wordpress_scripts.id
-  versioning_configuration {
-    status = "Enabled"
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256" # AES-256 encryption
+    }
   }
 }
 
-# --- Random String for Unique Resource Names --- #
+# --- Versioning Configuration for WordPress Scripts Bucket ---
+# Enables versioning for the WordPress scripts bucket to retain historical versions
+resource "aws_s3_bucket_versioning" "wordpress_scripts_versioning" {
+  bucket = aws_s3_bucket.wordpress_scripts.id
+  versioning_configuration {
+    status = "Enabled" # Enable versioning to maintain object history
+  }
+}
+
+# --- Random String for Unique Resource Names ---
+# Generates a suffix to make bucket names globally unique
 resource "random_string" "suffix" {
   length  = 5     # Length of the random string
   special = false # Disable special characters
   upper   = false # Disable uppercase letters
   lower   = true  # Enable lowercase letters
-  numeric = true  # Enable numeric characters (replacing deprecated 'number')
-
-  # Note: The 'number' argument is deprecated; using 'numeric' instead
+  numeric = true  # Enable numeric characters
 }

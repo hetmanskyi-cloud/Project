@@ -1,22 +1,66 @@
 # --- Security Group for EC2 Instances --- #
 
-# Define Security Group for EC2 with rules allowing HTTP access and open egress traffic
+# Define a Security Group for EC2 instances to allow HTTP, HTTPS, and SSM access
 resource "aws_security_group" "ec2_sg" {
   name_prefix = "${var.name_prefix}-ec2-sg"
   description = "Security group for EC2 instances running WordPress"
-  vpc_id      = var.vpc_id # Using the passed VPC ID
+  vpc_id      = var.vpc_id
 
+  # Ingress rule to allow HTTP access from any IP
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # Allow HTTP access for ALB
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Ingress rule to allow HTTPS access from any IP
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Egress rule to allow all outbound traffic
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.name_prefix}-ec2-sg"
+    Environment = var.environment
+  }
+}
+
+# --- Security Group for SSH Access --- #
+
+# Define a Security Group specifically for SSH access on port 22
+resource "aws_security_group" "ssh_access" {
+  vpc_id = var.vpc_id
+
+  # Ingress rule to allow SSH access from any IP for testing
+  # Recommended to restrict this to specific IPs for production
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Egress rule to allow all outbound traffic
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name        = "${var.name_prefix}-ssh-access"
+    Environment = var.environment
   }
 }

@@ -1,6 +1,6 @@
 # --- Public Route Table and Association --- #
 
-# Define the public route table for the public subnet
+# Define the public route table for routing internet-bound traffic in public subnets
 resource "aws_route_table" "public_route_table" {
   vpc_id = aws_vpc.vpc.id # Reference the VPC by its ID
 
@@ -16,15 +16,20 @@ resource "aws_route_table" "public_route_table" {
   }
 }
 
-# Associate the public route table with the public subnet for internet access
-resource "aws_route_table_association" "public_route_table_association" {
-  subnet_id      = aws_subnet.public_subnet.id           # Reference the public subnet by its ID
-  route_table_id = aws_route_table.public_route_table.id # Associate the route table with the public subnet
+# Associate the public route table with public subnets for internet access
+resource "aws_route_table_association" "public_route_table_association_1" {
+  subnet_id      = aws_subnet.public_subnet_1.id         # Reference the public subnet 1 by its ID
+  route_table_id = aws_route_table.public_route_table.id # Associate the route table with public subnet 1
 }
 
-# --- Private Route Table 1 and Association --- #
+resource "aws_route_table_association" "public_route_table_association_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id         # Reference the public subnet 2 by its ID
+  route_table_id = aws_route_table.public_route_table.id # Associate the route table with public subnet 2
+}
 
-# Define a private route table for the first private subnet
+# --- Private Route Tables and Associations --- #
+
+# Define a private route table for the first private subnet (no internet route)
 resource "aws_route_table" "private_route_table_1" {
   vpc_id = aws_vpc.vpc.id # Reference the VPC by its ID
 
@@ -34,15 +39,13 @@ resource "aws_route_table" "private_route_table_1" {
   }
 }
 
-# Associate the private route table 1 with the first private subnet for internal traffic only
+# Associate the private route table 1 with the first private subnet
 resource "aws_route_table_association" "private_route_table_association_1" {
   subnet_id      = aws_subnet.private_subnet_1.id           # Reference the first private subnet by its ID
   route_table_id = aws_route_table.private_route_table_1.id # Associate the route table with the first private subnet
 }
 
-# --- Private Route Table 2 and Association --- #
-
-# Define a private route table for the second private subnet
+# Define a private route table for the second private subnet (no internet route)
 resource "aws_route_table" "private_route_table_2" {
   vpc_id = aws_vpc.vpc.id # Reference the VPC by its ID
 
@@ -52,7 +55,7 @@ resource "aws_route_table" "private_route_table_2" {
   }
 }
 
-# Associate the private route table 2 with the second private subnet for internal traffic only
+# Associate the private route table 2 with the second private subnet
 resource "aws_route_table_association" "private_route_table_association_2" {
   subnet_id      = aws_subnet.private_subnet_2.id           # Reference the second private subnet by its ID
   route_table_id = aws_route_table.private_route_table_2.id # Associate the route table with the second private subnet

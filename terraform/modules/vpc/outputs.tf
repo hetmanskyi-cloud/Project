@@ -3,48 +3,63 @@
 # Output the VPC ID for reference in other modules or resources
 output "vpc_id" {
   description = "The ID of the VPC"
-  value       = aws_vpc.vpc.id # Reference the VPC ID
+  value       = aws_vpc.vpc.id
 }
 
-# --- Subnet Outputs --- #
+# --- Public Subnet Outputs --- #
 
-# Output the ID of the public subnet for further configurations
-output "public_subnet_id" {
-  description = "The ID of the public subnet"
-  value       = aws_subnet.public_subnet.id # Reference the public subnet ID
+# Output the ID of the first public subnet for further configurations
+output "public_subnet_1_id" {
+  description = "The ID of the first public subnet"
+  value       = aws_subnet.public_subnet_1.id
 }
+
+# Output the ID of the second public subnet for further configurations
+output "public_subnet_2_id" {
+  description = "The ID of the second public subnet"
+  value       = aws_subnet.public_subnet_2.id
+}
+
+# --- Private Subnet Outputs --- #
 
 # Output the ID of the first private subnet for secure resource placement
 output "private_subnet_1_id" {
   description = "The ID of the first private subnet"
-  value       = aws_subnet.private_subnet_1.id # Reference the first private subnet ID
+  value       = aws_subnet.private_subnet_1.id
 }
 
 # Output the ID of the second private subnet for secure resource placement
 output "private_subnet_2_id" {
   description = "The ID of the second private subnet"
-  value       = aws_subnet.private_subnet_2.id # Reference the second private subnet ID
+  value       = aws_subnet.private_subnet_2.id
 }
 
-# --- Internet Gateway Outputs --- #
+# --- Internet Gateway Output --- #
 
 # Output the Internet Gateway ID to configure public routing
 output "internet_gateway_id" {
   description = "The ID of the Internet Gateway"
-  value       = aws_internet_gateway.igw.id # Reference the Internet Gateway ID
+  value       = aws_internet_gateway.igw.id
 }
 
-# --- Route Table Outputs --- #
+# --- SSM Endpoint Security Group Output --- #
 
-# Output the public route table ID for routing configurations
-output "public_route_table_id" {
-  description = "The ID of the public route table"
-  value       = aws_route_table.public_route_table.id # Reference the public route table ID
+# Output the ID of the Security Group for the SSM endpoint
+output "ssm_endpoint_sg_id" {
+  description = "The Security Group ID for the SSM endpoint"
+  value       = aws_security_group.ssm_endpoint_sg.id
 }
 
-# --- Public Subnet CIDR Block Output --- #
+# --- Additional Outputs for CIDR Blocks --- #
 
-output "public_subnet_cidr_block" {
-  description = "The CIDR block for the public subnet"
-  value       = var.public_subnet_cidr_block
+# Output the CIDR block for the first public subnet
+output "public_subnet_cidr_block_1" {
+  description = "CIDR block for the first public subnet"
+  value       = var.public_subnet_cidr_block_1
+}
+
+# Output the CIDR block for the second public subnet
+output "public_subnet_cidr_block_2" {
+  description = "CIDR block for the second public subnet"
+  value       = var.public_subnet_cidr_block_2
 }

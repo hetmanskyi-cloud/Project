@@ -1,43 +1,51 @@
-# --- AWS Region --- #
+# --- AWS Region Configuration --- #
 
-# Define the AWS region where resources will be created
 variable "aws_region" {
-  description = "AWS region where resources will be created"
+  description = "The AWS region where resources will be created"
   type        = string
 }
 
 # --- VPC and Subnet Configuration --- #
 
-# Define the VPC CIDR block
 variable "vpc_cidr_block" {
   description = "The CIDR block for the VPC"
   type        = string
 }
 
-# Define the CIDR block and availability zone for the public subnet
-variable "public_subnet_cidr_block" {
-  description = "The CIDR block for the public subnet"
+# CIDR blocks and availability zones for public and private subnets
+
+variable "public_subnet_cidr_block_1" {
+  description = "The CIDR block for the first public subnet"
   type        = string
 }
 
-variable "availability_zone_public" {
-  description = "The availability zone for the public subnet"
+variable "public_subnet_cidr_block_2" {
+  description = "The CIDR block for the second public subnet"
   type        = string
 }
 
-# Define the CIDR block and availability zone for the private subnets
+variable "availability_zone_public_1" {
+  description = "The availability zone for the first public subnet"
+  type        = string
+}
+
+variable "availability_zone_public_2" {
+  description = "The availability zone for the second public subnet"
+  type        = string
+}
+
 variable "private_subnet_cidr_block_1" {
   description = "The CIDR block for the first private subnet"
   type        = string
 }
 
-variable "availability_zone_private_1" {
-  description = "The availability zone for the first private subnet"
+variable "private_subnet_cidr_block_2" {
+  description = "The CIDR block for the second private subnet"
   type        = string
 }
 
-variable "private_subnet_cidr_block_2" {
-  description = "The CIDR block for the second private subnet"
+variable "availability_zone_private_1" {
+  description = "The availability zone for the first private subnet"
   type        = string
 }
 
@@ -49,96 +57,32 @@ variable "availability_zone_private_2" {
 # --- AWS Account and Resource Naming --- #
 
 variable "aws_account_id" {
-  description = "AWS Account ID for KMS key policy"
+  description = "AWS Account ID for permissions and KMS key policy"
   type        = string
 }
 
 variable "environment" {
-  description = "Environment for the infrastructure (e.g., dev, prod)"
+  description = "The environment for resource organization (e.g., dev, prod)"
   type        = string
 }
 
 variable "name_prefix" {
-  description = "The prefix for resource names, used to differentiate environments (e.g., dev, prod)"
+  description = "Prefix for resource names, used to differentiate environments"
   type        = string
 }
 
-# --- RDS Configuration --- #
+# --- Monitoring Configuration --- #
 
-variable "allocated_storage" {
-  description = "Storage size in GB for the RDS instance"
-  type        = number
-}
-
-variable "instance_class" {
-  description = "Instance class for RDS"
-  type        = string
-}
-
-variable "engine" {
-  description = "Database engine for the RDS instance (e.g., MySQL, PostgreSQL)"
-  type        = string
-}
-
-variable "engine_version" {
-  description = "Database engine version"
-  type        = string
-}
-
-variable "db_username" {
-  description = "Master username for RDS"
-  type        = string
-}
-
-variable "db_password" {
-  description = "Master password for RDS"
-  type        = string
-  sensitive   = true
-}
-
-variable "db_name" {
-  description = "Initial database name"
-  type        = string
-}
-
-variable "db_port" {
-  description = "Database port for MySQL RDS"
-  type        = number
-}
-
-variable "redis_host" {
-  description = "Redis host endpoint for WordPress caching"
-  type        = string
-}
-
-variable "redis_port" {
-  description = "Redis port for caching"
-  type        = number
-}
-
-variable "backup_retention_period" {
-  description = "Number of days to retain RDS backups"
-  type        = number
-}
-
-variable "backup_window" {
-  description = "Preferred window for automated RDS backups"
-  type        = string
-}
-
-variable "multi_az" {
-  description = "Enable Multi-AZ deployment for RDS high availability"
+variable "enable_internet_monitor" {
+  description = "Enable or disable the Internet Monitor feature"
   type        = bool
+  default     = false
 }
 
-variable "enable_deletion_protection" {
-  description = "Enable or disable deletion protection for RDS instance"
-  type        = bool
-}
-
-variable "read_replica_count" {
-  description = "Number of read replicas for RDS"
+variable "traffic_percentage" {
+  description = "Percentage of traffic for monitoring"
   type        = number
+  default     = 100
 }
 
 # --- EC2 Configuration --- #
@@ -168,16 +112,102 @@ variable "autoscaling_max" {
   type        = number
 }
 
-# --- Monitoring Configuration --- #
+# EC2 Root Volume Configuration
+variable "volume_size" {
+  description = "The size of the root EBS volume in GB"
+  type        = number
+}
 
-variable "enable_internet_monitor" {
-  description = "Enable or disable the Internet Monitor feature"
+# SSH Key Pair Name
+variable "ssh_key_name" {
+  description = "The name of the SSH key pair to access EC2 instances"
+  type        = string
+}
+
+# --- RDS Configuration --- #
+
+variable "allocated_storage" {
+  description = "Storage size in GB for the RDS instance"
+  type        = number
+}
+
+variable "instance_class" {
+  description = "Instance class for RDS"
+  type        = string
+}
+
+variable "engine" {
+  description = "Database engine for the RDS instance (e.g., 'mysql', 'postgres')"
+  type        = string
+}
+
+variable "engine_version" {
+  description = "Database engine version"
+  type        = string
+}
+
+variable "db_username" {
+  description = "Master username for RDS"
+  type        = string
+}
+
+variable "db_password" {
+  description = "Master password for RDS"
+  type        = string
+  sensitive   = true
+}
+
+variable "db_name" {
+  description = "Initial database name"
+  type        = string
+}
+
+variable "db_port" {
+  description = "Database port for RDS (e.g., 3306 for MySQL)"
+  type        = number
+}
+
+variable "backup_retention_period" {
+  description = "Number of days to retain RDS backups"
+  type        = number
+}
+
+variable "backup_window" {
+  description = "Preferred window for automated RDS backups"
+  type        = string
+}
+
+variable "multi_az" {
+  description = "Enable Multi-AZ deployment for RDS high availability"
+  type        = bool
+}
+
+variable "enable_deletion_protection" {
+  description = "Enable or disable deletion protection for RDS instance"
+  type        = bool
+}
+
+variable "skip_final_snapshot" {
+  description = "Skip final snapshot when deleting the RDS instance"
   type        = bool
   default     = false
 }
 
-variable "traffic_percentage" {
-  description = "Percentage of traffic for monitoring"
+# Enable or disable enhanced monitoring for RDS
+variable "enable_monitoring" {
+  description = "Enable or disable enhanced monitoring for RDS instances"
+  type        = bool
+  default     = false
+}
+
+# --- Redis Configuration --- #
+
+variable "redis_host" {
+  description = "Redis host endpoint for WordPress caching"
+  type        = string
+}
+
+variable "redis_port" {
+  description = "Redis port for caching"
   type        = number
-  default     = 100
 }
