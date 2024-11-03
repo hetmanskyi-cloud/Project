@@ -44,6 +44,11 @@ resource "aws_dynamodb_table" "terraform_locks" {
     kms_key_arn = var.kms_key_arn # KMS key for DynamoDB encryption
   }
 
+  # Enable point-in-time recovery
+  point_in_time_recovery {
+    enabled = true
+  }
+
   attribute {
     name = "LockID"
     type = "S"
