@@ -70,25 +70,38 @@ resource "aws_network_acl_rule" "public_inbound_deny_all" {
   cidr_block     = "0.0.0.0/0"
 }
 
+# Rule: Allow outbound HTTP traffic (port 80) to any IP address
+resource "aws_network_acl_rule" "public_outbound_allow_http" {
+  network_acl_id = aws_network_acl.public_nacl.id
+  rule_number    = 90
+  egress         = true
+  protocol       = "tcp"
+  from_port      = 80 # HTTP port
+  to_port        = 80
+  cidr_block     = "0.0.0.0/0"
+  rule_action    = "allow"
+}
+
+# Rule: Allow outbound HTTPS traffic (port 443) to any IP address
+resource "aws_network_acl_rule" "public_outbound_allow_https" {
+  network_acl_id = aws_network_acl.public_nacl.id
+  rule_number    = 100
+  egress         = true
+  protocol       = "tcp"
+  from_port      = 443 # HTTPS port
+  to_port        = 443
+  cidr_block     = "0.0.0.0/0"
+  rule_action    = "allow"
+}
+
 # Rule: Allow all outbound traffic
 resource "aws_network_acl_rule" "public_outbound_allow_all" {
   network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 100
+  rule_number    = 110
   egress         = true # Outbound rule
   protocol       = "-1" # All protocols
   rule_action    = "allow"
   cidr_block     = "0.0.0.0/0"
-}
-
-# Associate the Public NACL with the public subnets
-resource "aws_network_acl_association" "public_nacl_association_1" {
-  subnet_id      = aws_subnet.public_subnet_1.id  # Public subnet 1 ID
-  network_acl_id = aws_network_acl.public_nacl.id # Public NACL ID
-}
-
-resource "aws_network_acl_association" "public_nacl_association_2" {
-  subnet_id      = aws_subnet.public_subnet_2.id  # Public subnet 2 ID
-  network_acl_id = aws_network_acl.public_nacl.id # Public NACL ID
 }
 
 # --- Private Network ACL Configuration --- #
@@ -143,6 +156,17 @@ resource "aws_network_acl_rule" "private_outbound_deny_all" {
   protocol       = "-1"
   rule_action    = "deny"
   cidr_block     = "0.0.0.0/0"
+}
+
+# Associate the Public NACL with the public subnets
+resource "aws_network_acl_association" "public_nacl_association_1" {
+  subnet_id      = aws_subnet.public_subnet_1.id  # Public subnet 1 ID
+  network_acl_id = aws_network_acl.public_nacl.id # Public NACL ID
+}
+
+resource "aws_network_acl_association" "public_nacl_association_2" {
+  subnet_id      = aws_subnet.public_subnet_2.id  # Public subnet 2 ID
+  network_acl_id = aws_network_acl.public_nacl.id # Public NACL ID
 }
 
 # Associate the Private NACL with the private subnets

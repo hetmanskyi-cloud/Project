@@ -68,6 +68,7 @@ module "s3" {
   environment    = var.environment
   name_prefix    = var.name_prefix
   aws_account_id = var.aws_account_id
+  kms_key_arn    = module.kms.kms_key_arn
 }
 
 # --- RDS Module Configuration ---
@@ -90,7 +91,7 @@ module "rds" {
   # Network configuration
   vpc_id                = module.vpc.vpc_id
   private_subnet_ids    = [module.vpc.private_subnet_1_id, module.vpc.private_subnet_2_id]
-  ec2_security_group_id = module.ec2.ec2_security_group_id # Ensure this variable is defined in the RDS module
+  ec2_security_group_id = module.ec2.ec2_security_group_id
   allowed_cidr_blocks   = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
 
   # Backup and replication settings
@@ -115,6 +116,7 @@ module "ec2" {
   autoscaling_min     = var.autoscaling_min
   autoscaling_max     = var.autoscaling_max
   volume_size         = var.volume_size
+  kms_key_arn         = module.kms.kms_key_arn
 
   # Network configuration
   subnet_ids                = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]

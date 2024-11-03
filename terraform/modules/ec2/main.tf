@@ -1,4 +1,4 @@
-# --- EC2 Launch Template Configuration ---
+# --- EC2 Launch Template Configuration --- #
 
 # Define the EC2 launch template with AMI, instance type, and security settings
 resource "aws_launch_template" "ec2" {
@@ -14,6 +14,11 @@ resource "aws_launch_template" "ec2" {
 
   # User data to execute the deploy_wordpress.sh script on instance launch
   user_data = var.user_data != "" ? base64encode(var.user_data) : null
+
+  # Configure Instance Metadata Service to require tokens
+  metadata_options {
+    http_tokens = "required" # Ensures only requests with a valid token can access metadata
+  }
 
   # Network interfaces configuration
   network_interfaces {
@@ -46,7 +51,7 @@ resource "aws_launch_template" "ec2" {
   }
 }
 
-# --- EC2 Auto Scaling Group Configuration ---
+# --- EC2 Auto Scaling Group Configuration --- #
 
 # Define the Auto Scaling Group with desired number of instances and subnet allocation
 resource "aws_autoscaling_group" "ec2_asg" {
@@ -74,7 +79,7 @@ resource "aws_autoscaling_group" "ec2_asg" {
   }
 }
 
-# --- Data Source to Fetch EC2 Instance IDs ---
+# --- Data Source to Fetch EC2 Instance IDs --- #
 
 # Fetch instances launched by the Auto Scaling Group
 data "aws_instances" "asg_instances" {
@@ -84,10 +89,11 @@ data "aws_instances" "asg_instances" {
   }
 }
 
-# --- CloudWatch Log Group for EC2 Instances ---
+# --- CloudWatch Log Group for EC2 Instances --- #
 
 # Define a CloudWatch Log Group for centralized logging of EC2 instances
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
   name              = "/aws/ec2/${var.name_prefix}" # Log group name with project prefix
   retention_in_days = 7                             # Retention policy for development environment
+  kms_key_id        = var.kms_key_arn               # Use KMS key for log encryption
 }

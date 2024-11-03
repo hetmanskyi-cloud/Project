@@ -128,6 +128,13 @@ variable "ssm_endpoint_sg_id" {
   type        = string
 }
 
+# --- KMS Key ARN for CloudWatch Logs Encryption ---
+# Specifies the ARN of the KMS key used to encrypt CloudWatch logs
+variable "kms_key_arn" {
+  description = "ARN of the KMS key for encrypting CloudWatch logs"
+  type        = string
+}
+
 # --- Public Subnet CIDR Blocks ---
 variable "public_subnet_cidr_blocks" {
   description = "List of CIDR blocks for the public subnets"

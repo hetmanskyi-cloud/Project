@@ -17,3 +17,8 @@ variable "aws_account_id" {
   description = "AWS Account ID for configuring S3 bucket policies and other resources"
   type        = string
 }
+
+variable "kms_key_arn" {
+  description = "ARN of the KMS key used for S3 bucket encryption"
+  type        = string
+}

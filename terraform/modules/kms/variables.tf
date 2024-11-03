@@ -1,32 +1,25 @@
 # --- KMS Module Variables --- #
 
-# AWS region for resource creation
-variable "aws_region" {
-  description = "The AWS region where resources are created"
-  type        = string
-}
-
-# AWS Account ID for KMS key permissions
+# AWS Account ID for configuring permissions in the KMS key policy
 variable "aws_account_id" {
-  description = "AWS account ID used for setting KMS key permissions"
+  description = "AWS Account ID for configuring permissions in the KMS key policy"
   type        = string
 }
 
-# KMS key name for identification and tagging
-variable "kms_key_name" {
-  description = "The name of the KMS key for easy identification"
-  type        = string
-  default     = "vpc-log-kms-key" # Default name for the KMS key
-}
-
-# Environment tag (e.g., dev, prod)
-variable "environment" {
-  description = "The environment label for tagging resources (e.g., dev, prod)"
+# AWS Region where the resources are created
+variable "aws_region" {
+  description = "AWS Region where the resources are created"
   type        = string
 }
 
-# Prefix for consistent resource naming
+# Prefix for naming KMS and related resources
 variable "name_prefix" {
-  description = "The name prefix to apply to all resources in this module"
+  description = "Name prefix for all resources"
+  type        = string
+}
+
+# Environment label for tracking resources (dev, stage, prod)
+variable "environment" {
+  description = "Environment label for organizing resources"
   type        = string
 }

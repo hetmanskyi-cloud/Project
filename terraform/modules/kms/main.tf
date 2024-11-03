@@ -1,11 +1,11 @@
-# --- KMS Key Configuration for CloudWatch Logs Encryption --- #
+# --- General Encryption Key Configuration for CloudWatch Logs and S3 Buckets --- #
 
-# Define the KMS key resource for encrypting CloudWatch logs and other services
-resource "aws_kms_key" "log_encryption_key" {
-  description         = "KMS key for encrypting CloudWatch logs and other resources"
-  enable_key_rotation = true # Enable automatic key rotation for security
+# Define a general KMS key resource to encrypt CloudWatch logs, S3 buckets, and other resources
+resource "aws_kms_key" "general_encryption_key" {
+  description         = "General KMS key for encrypting CloudWatch logs, S3 buckets, and other resources"
+  enable_key_rotation = true # Enable automatic key rotation for added security
 
-  # KMS key policy to control access permissions
+  # KMS key policy to control access permissions for services and root account
   policy = <<POLICY
   {
     "Version": "2012-10-17",
@@ -26,7 +26,8 @@ resource "aws_kms_key" "log_encryption_key" {
         "Action": [
           "kms:Encrypt",
           "kms:Decrypt",
-          "kms:ReEncrypt*",
+          "kms:ReEncryptFrom",
+          "kms:ReEncryptTo",
           "kms:GenerateDataKey*",
           "kms:DescribeKey"
         ],
@@ -36,9 +37,9 @@ resource "aws_kms_key" "log_encryption_key" {
   }
   POLICY
 
-  # Tags for the KMS key
+  # Tags for the general encryption key
   tags = {
-    Name        = "${var.name_prefix}-kms-log-encryption-key" # Dynamic name for KMS key using prefix
-    Environment = var.environment                             # Environment tag for resource tracking
+    Name        = "${var.name_prefix}-general-encryption-key" # Dynamic name for the encryption key
+    Environment = var.environment                             # Environment tag for tracking
   }
 }
