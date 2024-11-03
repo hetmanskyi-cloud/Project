@@ -1,0 +1,163 @@
+---
+# playbook_wordpress_install.yml - Ansible playbook for installing WordPress
+
+- name: Install and configure WordPress on Ubuntu server
+  hosts: wordpress_server
+  become: true
+  vars:
+    db_name: "{{ lookup('env', 'DB_NAME') | default('default_db_name') }}"
+    db_user: "{{ lookup('env', 'DB_USER') | default('default_db_user') }}"
+    db_password: "{{ lookup('env', 'DB_PASSWORD') | default('default_db_password') }}"
+    db_host: "{{ lookup('env', 'DB_HOST') | default('default_rds_host_endpoint') }}"
+    redis_host: "{{ lookup('env', 'REDIS_HOST') | default('default_redis_host') }}"
+    redis_port: "{{ lookup('env', 'REDIS_PORT') | default('6379') }}"
+
+  tasks:
+
+    # --- System update and required packages installation ---
+    - name: Update apt cache and upgrade system
+      apt:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - nginx
+          - mysql-client
+          - php-fpm
+          - php-mysql
+          - php-xml
+          - php-mbstring
+          - php-curl
+          - php-redis
+          - unzip
+        state: present
+
+    # --- Download and install WordPress ---
+    - name: Download WordPress
+      get_url:
+        url: https://wordpress.org/latest.zip
+        dest: /tmp/latest.zip
+
+    - name: Extract WordPress
+      unarchive:
+        src: /tmp/latest.zip
+        dest: /tmp
+        remote_src: yes
+
+    - name: Move WordPress to web root
+      command: mv /tmp/wordpress /var/www/html/wordpress
+      args:
+        removes: /tmp/latest.zip
+
+    # --- Set permissions for WordPress ---
+    - name: Set ownership for WordPress directory
+      file:
+        path: /var/www/html/wordpress
+        owner: www-data
+        group: www-data
+        recurse: yes
+
+    - name: Set permissions for WordPress directory
+      file:
+        path: /var/www/html/wordpress
+        mode: '0750'
+        recurse: yes
+
+    # --- Create WordPress configuration ---
+    - name: Copy wp-config-sample.php to wp-config.php
+      copy:
+        src: /var/www/html/wordpress/wp-config-sample.php
+        dest: /var/www/html/wordpress/wp-config.php
+        remote_src: yes
+
+    # --- Configure wp-config.php for database and Redis ---
+    - name: Configure wp-config.php with database settings
+      lineinfile:
+        path: /var/www/html/wordpress/wp-config.php
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+      loop:
+        - { regexp: 'database_name_here', line: "define('DB_NAME', '{{ db_name }}');" }
+        - { regexp: 'username_here', line: "define('DB_USER', '{{ db_user }}');" }
+        - { regexp: 'password_here', line: "define('DB_PASSWORD', '{{ db_password }}');" }
+        - { regexp: 'localhost', line: "define('DB_HOST', '{{ db_host }}');" }
+
+    - name: Add Redis configuration to wp-config.php
+      blockinfile:
+        path: /var/www/html/wordpress/wp-config.php
+        marker: "# {mark} ANSIBLE MANAGED BLOCK"
+        block: |
+          # Redis configuration
+          define('WP_REDIS_HOST', '{{ redis_host }}');
+          define('WP_REDIS_PORT', {{ redis_port }});
+          define('WP_CACHE', true);
+
+    - name: Set secure permissions for wp-config.php
+      file:
+        path: /var/www/html/wordpress/wp-config.php
+        mode: '0640'
+
+    # --- Configure Nginx for WordPress ---
+    - name: Configure Nginx for WordPress
+      copy:
+        dest: /etc/nginx/sites-available/wordpress
+        content: |
+          server {
+              listen 80 default_server;
+              server_name _;
+
+              root /var/www/html/wordpress;
+              index index.php index.html index.htm;
+
+              location / {
+                  try_files $uri $uri/ /index.php?$args;
+              }
+
+              location ~ \.php$ {
+                  include snippets/fastcgi-php.conf;
+                  fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+              }
+
+              location ~ /\.ht {
+                  deny all;
+              }
+          }
+
+    # Enable Nginx configuration and restart service
+    - name: Enable Nginx configuration
+      file:
+        src: /etc/nginx/sites-available/wordpress
+        dest: /etc/nginx/sites-enabled/wordpress
+        state: link
+
+    - name: Test Nginx configuration
+      command: nginx -t
+
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+    # --- Enable Nginx and PHP-FPM to start on boot ---
+    - name: Enable Nginx to start on boot
+      service:
+        name: nginx
+        enabled: yes
+
+    - name: Enable PHP-FPM to start on boot
+      service:
+        name: php8.3-fpm
+        enabled: yes
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted
+
+  post_tasks:
+    - name: Display WordPress installation complete message
+      debug:
+        msg: "WordPress installation and configuration complete."

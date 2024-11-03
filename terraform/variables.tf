@@ -124,6 +124,20 @@ variable "ssh_key_name" {
   type        = string
 }
 
+# User data script to run on instance launch, usually deploy_wordpress.sh
+variable "user_data" {
+  description = "Script to configure WordPress on instance launch (e.g., deploy_wordpress.sh)"
+  type        = string
+  default     = ""
+}
+
+# Ansible playbook for instance launch as alternative to deploy_wordpress.sh
+variable "ansible_playbook_user_data" {
+  description = "Ansible playbook to configure WordPress on instance launch"
+  type        = string
+  default     = ""
+}
+
 # --- RDS Configuration --- #
 
 variable "allocated_storage" {

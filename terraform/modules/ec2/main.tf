@@ -12,8 +12,10 @@ resource "aws_launch_template" "ec2" {
     name = aws_iam_instance_profile.ec2_instance_profile.name
   }
 
-  # User data to execute the deploy_wordpress.sh script on instance launch
-  user_data = var.user_data != "" ? base64encode(var.user_data) : null
+  # User data for EC2 instance setup
+  user_data = var.user_data != null && var.user_data != "" ? base64encode(var.user_data) : null
+  # Ansible playbook (Uncomment this line if you prefer to use Ansible):
+  # user_data = var.ansible_playbook_user_data != "" ? base64encode(var.ansible_playbook_user_data) : null
 
   # Configure Instance Metadata Service to require tokens
   metadata_options {

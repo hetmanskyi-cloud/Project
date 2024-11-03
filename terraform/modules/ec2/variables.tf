@@ -105,6 +105,12 @@ variable "user_data" {
   default     = ""
 }
 
+variable "ansible_playbook_user_data" {
+  description = "Path to the Ansible playbook user data script to be executed on instance launch"
+  type        = string
+  default     = "" # Set the path to the Ansible playbook if required
+}
+
 # --- Redis Configuration for WordPress Cache ---
 
 # Redis host endpoint for WordPress cache
