@@ -14,12 +14,12 @@ resource "aws_security_group" "ssm_endpoint_sg" {
     cidr_blocks = [aws_vpc.vpc.cidr_block] # Allow traffic from within the VPC CIDR
   }
 
-  # Egress rule to allow all outbound traffic
+  # Egress rule to allow only HTTPS outbound traffic
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"          # All protocols
-    cidr_blocks = ["0.0.0.0/0"] # Allow outbound to any destination
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # Outbound to any destination, limited to HTTPS
   }
 
   tags = {

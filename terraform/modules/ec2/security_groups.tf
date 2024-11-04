@@ -6,7 +6,9 @@ resource "aws_security_group" "ec2_sg" {
   description = "Security group for EC2 instances running WordPress"
   vpc_id      = var.vpc_id
 
-  # Ingress rule to allow HTTP access from any IP
+  # --- Ingress Rules (Inbound Traffic) --- #
+
+  # Allow inbound HTTP traffic from any IP
   ingress {
     description = "Allow HTTP traffic from any IP address"
     from_port   = 80
@@ -15,21 +17,12 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Ingress rule to allow HTTPS access from any IP
+  # Allow inbound HTTPS traffic from any IP
   ingress {
     description = "Allow HTTPS traffic from any IP address"
     from_port   = 443
     to_port     = 443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Egress rule to allow all outbound traffic
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -46,8 +39,9 @@ resource "aws_security_group" "ssh_access" {
   vpc_id      = var.vpc_id
   description = "Security group for SSH access"
 
-  # Ingress rule to allow SSH access from any IP for testing
-  # Recommended to restrict this to specific IPs for production
+  # --- Ingress Rules (Inbound Traffic) --- #
+
+  # Allow inbound SSH access from any IP for testing purposes
   ingress {
     description = "Allow SSH access from any IP address for testing purposes"
     from_port   = 22
@@ -56,17 +50,43 @@ resource "aws_security_group" "ssh_access" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Egress rule to allow all outbound traffic
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name        = "${var.name_prefix}-ssh-access"
     Environment = var.environment
   }
+}
+
+# --- Common Egress Rules (Outbound Traffic) --- #
+
+# Allow outbound HTTP traffic
+resource "aws_security_group_rule" "egress_http" {
+  type              = "egress"
+  from_port         = 80
+  to_port           = 80
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow outbound HTTP traffic"
+}
+
+# Allow outbound HTTPS traffic
+resource "aws_security_group_rule" "egress_https" {
+  type              = "egress"
+  from_port         = 443
+  to_port           = 443
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ec2_sg.id
+  description       = "Allow outbound HTTPS traffic"
+}
+
+# Allow outbound SSH traffic
+resource "aws_security_group_rule" "egress_ssh" {
+  type              = "egress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = ["0.0.0.0/0"]
+  security_group_id = aws_security_group.ssh_access.id
+  description       = "Allow outbound SSH traffic"
 }
