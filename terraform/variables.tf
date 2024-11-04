@@ -76,14 +76,6 @@ variable "name_prefix" {
   type        = string
 }
 
-# --- Monitoring Configuration --- #
-
-variable "flow_logs_role_arn" {
-  description = "IAM Role ARN for VPC Flow Logs"
-  type        = string
-  default     = null
-}
-
 variable "enable_internet_monitor" {
   description = "Enable or disable the Internet Monitor feature"
   type        = bool
