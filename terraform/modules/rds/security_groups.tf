@@ -8,16 +8,18 @@ resource "aws_security_group" "rds_sg" {
 
   # --- Ingress Rules --- #
 
-  # Allow inbound traffic from EC2 instances in the specified security group
+  # Rule: Allow inbound traffic on the database port from EC2 instances in the specified security group
   ingress {
+    description     = "Allow inbound DB traffic from EC2 instances"
     from_port       = var.db_port # Database port
     to_port         = var.db_port
     protocol        = "tcp"
     security_groups = [var.ec2_security_group_id] # Allow from EC2 security group
   }
 
-  # Allow inbound traffic from specified CIDR blocks (e.g., for administrative access)
+  # Rule: Allow inbound traffic on the database port from specific CIDR blocks for administrative access
   ingress {
+    description = "Allow inbound DB traffic from allowed CIDR blocks"
     from_port   = var.db_port
     to_port     = var.db_port
     protocol    = "tcp"
@@ -26,8 +28,9 @@ resource "aws_security_group" "rds_sg" {
 
   # --- Egress Rules --- #
 
-  # Allow only necessary outbound traffic to communicate with the WordPress application
+  # Rule: Allow outbound traffic on the database port to the EC2 security group for application access
   egress {
+    description     = "Allow outbound DB traffic to EC2 instances"
     from_port       = var.db_port # Database port
     to_port         = var.db_port
     protocol        = "tcp"
