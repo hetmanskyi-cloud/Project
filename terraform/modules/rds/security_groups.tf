@@ -26,12 +26,12 @@ resource "aws_security_group" "rds_sg" {
 
   # --- Egress Rules --- #
 
-  # Allow all outbound traffic (adjust if needed)
+  # Allow only necessary outbound traffic to communicate with the WordPress application
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port       = var.db_port # Database port
+    to_port         = var.db_port
+    protocol        = "tcp"
+    security_groups = [var.ec2_security_group_id] # Restrict egress to only the EC2 security group for application traffic
   }
 
   # --- Tags --- #
