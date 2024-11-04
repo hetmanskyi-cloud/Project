@@ -152,3 +152,9 @@ variable "ssh_key_name" {
   description = "The name of the SSH key pair to access EC2 instances"
   type        = string
 }
+
+# --- Allowed SSH CIDR Blocks --- #
+variable "allowed_ssh_cidr" {
+  description = "List of CIDR blocks allowed for SSH access"
+  type        = list(string)
+}

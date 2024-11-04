@@ -14,6 +14,12 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+# --- Allowed SSH CIDR Blocks --- #
+variable "allowed_ssh_cidr" {
+  description = "List of CIDR blocks allowed for SSH access"
+  type        = list(string)
+}
+
 # --- Public Subnet 1 Configuration --- #
 
 # Define the CIDR block for the first public subnet
@@ -94,4 +100,10 @@ variable "name_prefix" {
 variable "environment" {
   description = "Environment label for resources (e.g., dev, staging, prod)"
   type        = string
+}
+
+variable "flow_logs_role_arn" {
+  description = "IAM Role ARN for VPC Flow Logs"
+  type        = string
+  default     = null
 }

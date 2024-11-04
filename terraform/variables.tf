@@ -12,6 +12,11 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
+variable "allowed_ssh_cidr" {
+  description = "List of CIDR blocks allowed for SSH access"
+  type        = list(string)
+}
+
 # CIDR blocks and availability zones for public and private subnets
 
 variable "public_subnet_cidr_block_1" {
@@ -72,6 +77,12 @@ variable "name_prefix" {
 }
 
 # --- Monitoring Configuration --- #
+
+variable "flow_logs_role_arn" {
+  description = "IAM Role ARN for VPC Flow Logs"
+  type        = string
+  default     = null
+}
 
 variable "enable_internet_monitor" {
   description = "Enable or disable the Internet Monitor feature"
