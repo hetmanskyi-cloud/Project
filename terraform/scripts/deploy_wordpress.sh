@@ -1,17 +1,14 @@
 #!/bin/bash
 
-# --- System Update and Required Packages Installation ---
+# --- System update and required packages installation ---
 echo "Updating system and installing required packages..."
-# Update package list and upgrade existing packages
 sudo apt update && sudo apt upgrade -y && sleep 2
-
-# Install Nginx, MySQL client, PHP, and required extensions
 sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip || {
   echo "Package installation failed. Please check the connection and package availability."
   exit 1
 }
 
-# --- Download and Install WordPress ---
+# --- Download and install WordPress ---
 echo "Downloading and installing WordPress..."
 cd /tmp || exit
 curl -O https://wordpress.org/latest.zip
@@ -23,10 +20,10 @@ rm latest.zip  # Clean up downloaded zip file
 sudo chown -R www-data:www-data /var/www/html/wordpress
 sudo chmod -R 750 /var/www/html/wordpress
 
-# Create a WordPress configuration file from the sample
+# Copy default WordPress config
 sudo cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
-# --- Set Environment Variables for Database and Redis ---
+# --- Set environment variables for database and Redis ---
 DB_NAME="${DB_NAME:-default_db_name}"
 DB_USER="${DB_USER:-default_db_user}"
 DB_PASSWORD="${DB_PASSWORD:-default_db_password}"
@@ -70,7 +67,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php-fpm.sock;
+        fastcgi_pass unix:/run/php/php-fpm.sock;  # Use the general php-fpm socket path for the latest version
     }
 
     location ~ /\.ht {
@@ -84,17 +81,19 @@ echo "Enabling Nginx configuration and restarting the service..."
 sudo ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl restart nginx
 
-# --- Enable Nginx and PHP-FPM to Start on Boot ---
+# --- Enable Nginx and PHP-FPM to start on boot ---
 echo "Enabling Nginx and PHP-FPM to start on boot..."
 sudo systemctl enable --now nginx
 sudo systemctl enable --now php-fpm
 
-# --- Allow Nginx through Firewall (if ufw is active) ---
-# Allow HTTP and HTTPS traffic if ufw firewall is enabled
-sudo ufw allow 'Nginx Full'
+# --- Configure UFW Firewall (if enabled) ---
+if sudo ufw status | grep -qw "active"; then
+  echo "Configuring UFW firewall for Nginx..."
+  sudo ufw allow 'Nginx Full'
+fi
 
-# --- Verify Nginx is Running ---
-echo "Verifying Nginx is running..."
-curl -I localhost || echo "Nginx might not be running. Please check the configuration and logs."
+# --- Final Check ---
+echo "Checking Nginx status..."
+curl -I localhost || echo "Nginx may not be running. Please check the configuration."
 
 echo "WordPress installation and configuration complete."
