@@ -47,20 +47,8 @@ resource "aws_network_acl_rule" "public_inbound_allow_ssh" {
   protocol       = "tcp"                          # TCP protocol
   from_port      = 22                             # Start port for SSH
   to_port        = 22                             # End port for SSH
-  cidr_block     = var.allowed_ssh_cidr[0]        # Allowed CIDR for SSH access
+  cidr_block     = "0.0.0.0/0"                    # Allowed CIDR for SSH access
   rule_action    = "allow"                        # Allow traffic
-}
-
-# Rule: Allow inbound ephemeral ports (1024-65535) for return traffic
-resource "aws_network_acl_rule" "public_inbound_allow_ephemeral" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 210
-  egress         = false
-  protocol       = "tcp"
-  from_port      = 1024
-  to_port        = 65535
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "allow"
 }
 
 # Egress Rules: Allow outbound traffic for HTTP, HTTPS, SSH
@@ -97,7 +85,19 @@ resource "aws_network_acl_rule" "public_outbound_allow_ssh" {
   protocol       = "tcp"
   from_port      = 22
   to_port        = 22
-  cidr_block     = var.allowed_ssh_cidr[0]
+  cidr_block     = "0.0.0.0/0"
+  rule_action    = "allow"
+}
+
+# Rule: Allow outbound ephemeral ports (1024-65535) for return traffic
+resource "aws_network_acl_rule" "public_outbound_allow_ephemeral" {
+  network_acl_id = aws_network_acl.public_nacl.id
+  rule_number    = 250
+  egress         = true
+  protocol       = "tcp"
+  from_port      = 1024
+  to_port        = 65535
+  cidr_block     = "0.0.0.0/0"
   rule_action    = "allow"
 }
 

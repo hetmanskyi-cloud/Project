@@ -12,11 +12,6 @@ variable "vpc_cidr_block" {
   type        = string
 }
 
-variable "allowed_ssh_cidr" {
-  description = "List of CIDR blocks allowed for SSH access"
-  type        = list(string)
-}
-
 # CIDR blocks and availability zones for public and private subnets
 
 variable "public_subnet_cidr_block_1" {

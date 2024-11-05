@@ -5,7 +5,6 @@ module "vpc" {
 
   # VPC CIDR block and subnet configurations
   vpc_cidr_block              = var.vpc_cidr_block
-  allowed_ssh_cidr            = var.allowed_ssh_cidr
   public_subnet_cidr_block_1  = var.public_subnet_cidr_block_1
   public_subnet_cidr_block_2  = var.public_subnet_cidr_block_2
   private_subnet_cidr_block_1 = var.private_subnet_cidr_block_1
@@ -127,7 +126,6 @@ module "ec2" {
   ssm_endpoint_sg_id        = module.vpc.ssm_endpoint_sg_id
   public_subnet_cidr_blocks = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
   ssh_key_name              = var.ssh_key_name
-  allowed_ssh_cidr          = var.allowed_ssh_cidr
 
   # WordPress database and Redis configuration
   db_name     = var.db_name
@@ -137,7 +135,10 @@ module "ec2" {
   db_port     = var.db_port
   redis_host  = var.redis_host
   redis_port  = var.redis_port
-  user_data   = var.user_data != "" ? base64encode(var.user_data) : (var.ansible_playbook_user_data != "" ? base64encode(var.ansible_playbook_user_data) : null)
+  user_data   = file("${path.root}/scripts/deploy_wordpress.sh")
+
+  # Ansible playbook (Uncomment this line if you prefer to use Ansible):
+  # user_data = base64encode(file("${path.root}/scripts/playbook_wordpress_install.yml"))
 
   # Tags and environment information
   name_prefix = var.name_prefix

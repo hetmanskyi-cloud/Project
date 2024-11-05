@@ -1,29 +1,32 @@
 #!/bin/bash
 
-# --- System update and required packages installation ---
+# --- System Update and Required Packages Installation ---
 echo "Updating system and installing required packages..."
-sudo apt update && sudo apt upgrade -y
+# Update package list and upgrade existing packages
+sudo apt update && sudo apt upgrade -y && sleep 2
+
+# Install Nginx, MySQL client, PHP, and required extensions
 sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip || {
   echo "Package installation failed. Please check the connection and package availability."
   exit 1
 }
 
-# --- Download and install WordPress ---
+# --- Download and Install WordPress ---
 echo "Downloading and installing WordPress..."
 cd /tmp || exit
 curl -O https://wordpress.org/latest.zip
 unzip latest.zip
 sudo mv wordpress /var/www/html/wordpress
-rm latest.zip # Clean up
+rm latest.zip  # Clean up downloaded zip file
 
-# Set permissions for WordPress
+# Set permissions for WordPress directory
 sudo chown -R www-data:www-data /var/www/html/wordpress
 sudo chmod -R 750 /var/www/html/wordpress
 
-# Create WordPress configuration
+# Create a WordPress configuration file from the sample
 sudo cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
 
-# --- Set environment variables for database and Redis ---
+# --- Set Environment Variables for Database and Redis ---
 DB_NAME="${DB_NAME:-default_db_name}"
 DB_USER="${DB_USER:-default_db_user}"
 DB_PASSWORD="${DB_PASSWORD:-default_db_password}"
@@ -67,7 +70,7 @@ server {
 
     location ~ \.php\$ {
         include snippets/fastcgi-php.conf;
-        fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+        fastcgi_pass unix:/run/php/php-fpm.sock;
     }
 
     location ~ /\.ht {
@@ -81,9 +84,17 @@ echo "Enabling Nginx configuration and restarting the service..."
 sudo ln -s /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl restart nginx
 
-# --- Enable Nginx and PHP-FPM to start on boot ---
+# --- Enable Nginx and PHP-FPM to Start on Boot ---
 echo "Enabling Nginx and PHP-FPM to start on boot..."
-sudo systemctl enable nginx
-sudo systemctl enable php8.3-fpm
+sudo systemctl enable --now nginx
+sudo systemctl enable --now php-fpm
+
+# --- Allow Nginx through Firewall (if ufw is active) ---
+# Allow HTTP and HTTPS traffic if ufw firewall is enabled
+sudo ufw allow 'Nginx Full'
+
+# --- Verify Nginx is Running ---
+echo "Verifying Nginx is running..."
+curl -I localhost || echo "Nginx might not be running. Please check the configuration and logs."
 
 echo "WordPress installation and configuration complete."
