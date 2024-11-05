@@ -1,12 +1,12 @@
 # --- Security Group for VPC Endpoints --- #
 
-# Security Group for SSM VPC Endpoints
+# Security Group for SSM Endpoint
 resource "aws_security_group" "ssm_endpoint_sg" {
-  name        = "${var.name_prefix}-ssm-endpoint-sg"   # Dynamic name for SSM Endpoint SG
-  description = "Security Group for SSM VPC Endpoints" # Description of the Security Group
-  vpc_id      = aws_vpc.vpc.id                         # Attach to the created VPC
+  name        = "${var.name_prefix}-ssm-endpoint-sg"     # Dynamic name for SSM Endpoint SG
+  description = "Security Group for SSM endpoint access" # Description of the Security Group
+  vpc_id      = aws_vpc.vpc.id                           # Attach to the created VPC
 
-  # Ingress rule to allow HTTPS (port 443) traffic within the VPC
+  # Ingress Rule: Allow HTTPS traffic within VPC for SSM Endpoint
   ingress {
     from_port   = 443
     to_port     = 443
@@ -14,7 +14,7 @@ resource "aws_security_group" "ssm_endpoint_sg" {
     cidr_blocks = [aws_vpc.vpc.cidr_block] # Allow traffic from within the VPC CIDR
   }
 
-  # Egress rule to allow only HTTPS outbound traffic
+  # Egress Rule: Allow HTTPS traffic to any destination
   egress {
     from_port   = 443
     to_port     = 443
