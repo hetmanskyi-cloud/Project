@@ -146,13 +146,6 @@ variable "allow_ssh_access" {
   type        = bool
 }
 
-# Script to configure WordPress on instance launch (e.g., deploy_wordpress.sh)
-variable "user_data" {
-  description = "Script to configure WordPress on instance launch (e.g., deploy_wordpress.sh)"
-  type        = string
-  default     = ""
-}
-
 # Number of days to retain CloudWatch logs
 variable "log_retention_in_days" {
   description = "Number of days to retain CloudWatch logs"
