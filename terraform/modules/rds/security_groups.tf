@@ -10,11 +10,11 @@ resource "aws_security_group" "rds_sg" {
 
   # Rule: Allow inbound traffic on the database port from EC2 instances in the specified security group
   ingress {
-    description     = "Allow inbound DB traffic from EC2 instances"
-    from_port       = var.db_port # Database port
-    to_port         = var.db_port
-    protocol        = "tcp"
-    security_groups = [var.ec2_security_group_id] # Allow from EC2 security group
+    description = "Allow inbound DB traffic from EC2 instances"
+    from_port   = var.db_port # Database port
+    to_port     = var.db_port
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidr_blocks # Allow from EC2 security group
   }
 
   # Rule: Allow inbound traffic on the database port from specific CIDR blocks for administrative access
@@ -23,18 +23,18 @@ resource "aws_security_group" "rds_sg" {
     from_port   = var.db_port
     to_port     = var.db_port
     protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks # List of allowed CIDR blocks
+    cidr_blocks = var.private_subnet_cidr_blocks # List of allowed CIDR blocks
   }
 
   # --- Egress Rules --- #
 
   # Rule: Allow outbound traffic on the database port to the EC2 security group for application access
   egress {
-    description     = "Allow outbound DB traffic to EC2 instances"
-    from_port       = var.db_port # Database port
-    to_port         = var.db_port
-    protocol        = "tcp"
-    security_groups = [var.ec2_security_group_id] # Restrict egress to only the EC2 security group for application traffic
+    description = "Allow outbound DB traffic to EC2 instances"
+    from_port   = var.db_port # Database port
+    to_port     = var.db_port
+    protocol    = "tcp"
+    cidr_blocks = var.private_subnet_cidr_blocks # Restrict egress to only the EC2 security group for application traffic
   }
 
   # --- Tags --- #

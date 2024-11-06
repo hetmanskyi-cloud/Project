@@ -27,9 +27,9 @@ resource "aws_launch_template" "ec2" {
     associate_public_ip_address = true # Assign a public IP address to instances
     delete_on_termination       = true # Remove network interface on termination
     security_groups = [
-      aws_security_group.ec2_sg.id,     # SG for HTTP/HTTPS access
-      aws_security_group.ssh_access.id, # SG for SSH access
-      var.ssm_endpoint_sg_id            # SG for SSM access
+      aws_security_group.ec2_sg.id, # SG for HTTP/HTTPS access
+      var.ssh_security_group_id,    # SG for SSH access
+      var.ssm_endpoint_sg_id        # SG for SSM access
     ]
   }
 
@@ -60,7 +60,7 @@ resource "aws_autoscaling_group" "ec2_asg" {
   desired_capacity    = var.autoscaling_desired # Desired number of instances
   min_size            = var.autoscaling_min     # Minimum number of instances
   max_size            = var.autoscaling_max     # Maximum number of instances
-  vpc_zone_identifier = var.subnet_ids          # Subnet IDs for Auto Scaling Group
+  vpc_zone_identifier = var.subnet_ids          # List of subnet IDs for Auto Scaling Group across multiple availability zones
 
   launch_template {
     id      = aws_launch_template.ec2.id
@@ -81,6 +81,60 @@ resource "aws_autoscaling_group" "ec2_asg" {
   }
 }
 
+# --- CloudWatch Alarms for Auto Scaling ---
+
+# Alarm for scaling out (add instance when CPU > threshold)
+resource "aws_cloudwatch_metric_alarm" "scale_out_alarm" {
+  alarm_name          = "${var.name_prefix}-scale-out"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300
+  statistic           = "Average"
+  threshold           = var.scale_out_cpu_threshold
+  alarm_actions       = [aws_autoscaling_policy.scale_out_policy.arn]
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.ec2_asg.name
+  }
+}
+
+# Alarm for scaling in (remove instance when CPU < threshold)
+resource "aws_cloudwatch_metric_alarm" "scale_in_alarm" {
+  alarm_name          = "${var.name_prefix}-scale-in"
+  comparison_operator = "LessThanThreshold"
+  evaluation_periods  = 2
+  metric_name         = "CPUUtilization"
+  namespace           = "AWS/EC2"
+  period              = 300
+  statistic           = "Average"
+  threshold           = var.scale_in_cpu_threshold
+  alarm_actions       = [aws_autoscaling_policy.scale_in_policy.arn]
+  dimensions = {
+    AutoScalingGroupName = aws_autoscaling_group.ec2_asg.name
+  }
+}
+
+# --- Auto Scaling Policies ---
+
+# Scale-out policy to add an instance when CPU utilization is high
+resource "aws_autoscaling_policy" "scale_out_policy" {
+  name                   = "${var.name_prefix}-scale-out-policy"
+  scaling_adjustment     = 1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = var.autoscaling_cooldown
+  autoscaling_group_name = aws_autoscaling_group.ec2_asg.name
+}
+
+# Scale-in policy to remove an instance when CPU utilization is low
+resource "aws_autoscaling_policy" "scale_in_policy" {
+  name                   = "${var.name_prefix}-scale-in-policy"
+  scaling_adjustment     = -1
+  adjustment_type        = "ChangeInCapacity"
+  cooldown               = var.autoscaling_cooldown
+  autoscaling_group_name = aws_autoscaling_group.ec2_asg.name
+}
+
 # --- Data Source to Fetch EC2 Instance IDs --- #
 
 # Fetch instances launched by the Auto Scaling Group
@@ -96,6 +150,6 @@ data "aws_instances" "asg_instances" {
 # Define a CloudWatch Log Group for centralized logging of EC2 instances
 resource "aws_cloudwatch_log_group" "ec2_log_group" {
   name              = "/aws/ec2/${var.name_prefix}" # Log group name with project prefix
-  retention_in_days = 7                             # Retention policy for development environment
+  retention_in_days = var.log_retention_in_days     # Retention policy for log retention, defined in variables
   kms_key_id        = var.kms_key_arn               # Use KMS key for log encryption
 }

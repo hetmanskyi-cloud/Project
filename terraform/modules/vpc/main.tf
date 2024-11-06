@@ -42,18 +42,6 @@ resource "aws_subnet" "public_subnet_2" {
   }
 }
 
-# --- Internet Gateway Configuration --- #
-
-# Create an Internet Gateway to provide internet access to public subnets
-resource "aws_internet_gateway" "igw" {
-  vpc_id = aws_vpc.vpc.id # Attach the Internet Gateway to the VPC
-
-  tags = {
-    Name        = "${var.name_prefix}-igw" # Dynamic name for the Internet Gateway
-    Environment = var.environment          # Environment tag for resource organization
-  }
-}
-
 # --- Private Subnet 1 Configuration --- #
 
 # Define the first private subnet, without public IP assignment

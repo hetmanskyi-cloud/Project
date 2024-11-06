@@ -1,4 +1,4 @@
-# --- Naming and Environment Configuration ---
+# --- Naming and Environment Configuration --- #
 
 # Define the name prefix for resources
 variable "name_prefix" {
@@ -12,7 +12,7 @@ variable "environment" {
   type        = string
 }
 
-# --- VPC and Instance Configuration ---
+# --- VPC and Instance Configuration --- #
 
 # VPC ID to associate with the EC2 instances
 variable "vpc_id" {
@@ -32,7 +32,7 @@ variable "volume_size" {
   type        = number
 }
 
-# --- Subnet Configuration ---
+# --- Subnet Configuration --- #
 
 # List of subnet IDs for launching EC2 instances
 variable "subnet_ids" {
@@ -46,7 +46,7 @@ variable "instance_type" {
   type        = string
 }
 
-# --- Auto-scaling Configuration ---
+# --- Auto-scaling Configuration --- #
 
 # Auto-scaling group desired capacity
 variable "autoscaling_desired" {
@@ -66,7 +66,27 @@ variable "autoscaling_max" {
   type        = number
 }
 
-# --- Database Configuration for WordPress ---
+# --- Auto Scaling Scaling Policies Configuration ---
+
+# CPU utilization threshold to scale out
+variable "scale_out_cpu_threshold" {
+  description = "CPU utilization threshold to scale out EC2 instances"
+  type        = number
+}
+
+# CPU utilization threshold to scale in
+variable "scale_in_cpu_threshold" {
+  description = "CPU utilization threshold to scale in EC2 instances"
+  type        = number
+}
+
+# Cooldown period for Auto Scaling actions
+variable "autoscaling_cooldown" {
+  description = "Cooldown period (in seconds) between Auto Scaling actions"
+  type        = number
+}
+
+# --- Database Configuration for WordPress --- #
 
 # Database name for WordPress
 variable "db_name" {
@@ -111,7 +131,7 @@ variable "ansible_playbook_user_data" {
   default     = "" # Set the path to the Ansible playbook if required
 }
 
-# --- Redis Configuration for WordPress Cache ---
+# --- Redis Configuration for WordPress Cache --- #
 
 # Redis host endpoint for WordPress cache
 variable "redis_host" {
@@ -126,7 +146,7 @@ variable "redis_port" {
   default     = 6379
 }
 
-# --- Security Configuration ---
+# --- Security Configuration --- #
 
 # Security Group ID for SSM endpoint
 variable "ssm_endpoint_sg_id" {
@@ -134,16 +154,21 @@ variable "ssm_endpoint_sg_id" {
   type        = string
 }
 
-# --- KMS Key ARN for CloudWatch Logs Encryption ---
+variable "ssh_security_group_id" {
+  description = "ID of the SSH Security Group for EC2 instances"
+  type        = string
+}
+
+# --- KMS Key ARN for CloudWatch Logs Encryption --- #
 # Specifies the ARN of the KMS key used to encrypt CloudWatch logs
 variable "kms_key_arn" {
   description = "ARN of the KMS key for encrypting CloudWatch logs"
   type        = string
 }
 
-# --- Public Subnet CIDR Blocks ---
+# --- Public Subnet CIDR Blocks --- #
 variable "public_subnet_cidr_blocks" {
-  description = "List of CIDR blocks for the public subnets"
+  description = "List of CIDR blocks for the public subnets. Can be used for controlling allowed IP ranges in ALB Security Group or other access configurations."
   type        = list(string)
 }
 
@@ -151,4 +176,12 @@ variable "public_subnet_cidr_blocks" {
 variable "ssh_key_name" {
   description = "The name of the SSH key pair to access EC2 instances"
   type        = string
+}
+
+# --- CloudWatch Log Group --- #
+
+# Define log retention period for CloudWatch Log Group
+variable "log_retention_in_days" {
+  description = "Number of days to retain CloudWatch logs"
+  type        = number
 }

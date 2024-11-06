@@ -1,4 +1,3 @@
----
 # playbook_wordpress_install.yml - Ansible playbook for installing WordPress
 
 - name: Install and configure WordPress on Ubuntu server
@@ -50,6 +49,11 @@
       command: mv /tmp/wordpress /var/www/html/wordpress
       args:
         removes: /tmp/latest.zip
+
+    - name: Delete downloaded WordPress zip file
+      file:
+        path: /tmp/latest.zip
+        state: absent
 
     # --- Set permissions for WordPress ---
     - name: Set ownership for WordPress directory
@@ -112,12 +116,12 @@
               index index.php index.html index.htm;
 
               location / {
-                  try_files $uri $uri/ /index.php?$args;
+                  try_files \$uri \$uri/ /index.php?\$args;
               }
 
               location ~ \.php$ {
                   include snippets/fastcgi-php.conf;
-                  fastcgi_pass unix:/run/php/php8.3-fpm.sock;
+                  fastcgi_pass unix:/run/php/php-fpm.sock; # Universal path for PHP-FPM socket
               }
 
               location ~ /\.ht {
@@ -125,7 +129,6 @@
               }
           }
 
-    # Enable Nginx configuration and restart service
     - name: Enable Nginx configuration
       file:
         src: /etc/nginx/sites-available/wordpress
@@ -134,13 +137,9 @@
 
     - name: Test Nginx configuration
       command: nginx -t
+      notify: Restart Nginx
 
-    - name: Restart Nginx
-      service:
-        name: nginx
-        state: restarted
-
-    # --- Enable Nginx and PHP-FPM to start on boot ---
+    # --- Enable services on boot and restart as needed ---
     - name: Enable Nginx to start on boot
       service:
         name: nginx
@@ -148,7 +147,7 @@
 
     - name: Enable PHP-FPM to start on boot
       service:
-        name: php8.3-fpm
+        name: php-fpm
         enabled: yes
 
   handlers:

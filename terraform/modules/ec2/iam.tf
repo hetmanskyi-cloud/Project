@@ -1,6 +1,6 @@
 # --- IAM Role for EC2 with SSM Access --- #
 
-# Define an IAM Role for EC2 instances to allow access to SSM
+# This IAM Role allows EC2 instances to access AWS SSM (Systems Manager)
 resource "aws_iam_role" "ec2_ssm_role" {
   name = "${var.name_prefix}-ec2-ssm-role"
 
@@ -24,14 +24,14 @@ resource "aws_iam_role" "ec2_ssm_role" {
 }
 
 # Attach the managed policy to the IAM Role to allow SSM access
+# This policy provides the necessary permissions for the EC2 instance to use SSM
 resource "aws_iam_role_policy_attachment" "ec2_ssm_role_policy" {
   role       = aws_iam_role.ec2_ssm_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
 # --- IAM Instance Profile for EC2 Instances --- #
-
-# Define an IAM Instance Profile to attach the IAM Role to EC2 instances
+# The Instance Profile allows the IAM Role to be attached to EC2 instances for SSM access
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${var.name_prefix}-ec2-instance-profile"
   role = aws_iam_role.ec2_ssm_role.name

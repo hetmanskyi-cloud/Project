@@ -16,14 +16,16 @@ module "vpc" {
   availability_zone_private_1 = var.availability_zone_private_1
   availability_zone_private_2 = var.availability_zone_private_2
 
-  # Region and account information
-  region         = var.aws_region
+  # AWS-specific configurations
+  aws_region     = var.aws_region
   aws_account_id = var.aws_account_id
+  vpc_id         = module.vpc.vpc_id
 
-  # Security, monitoring and encryption
-  kms_key_arn        = module.kms.kms_key_arn # KMS key ARN used for encryption of CloudWatch Logs
-  flow_logs_role_arn = module.flow_logs.flow_logs_role_arn
-
+  # Security and monitoring settings
+  kms_key_arn           = module.kms.kms_key_arn              # For encryption of CloudWatch Logs
+  flow_logs_role_arn    = module.flow_logs.flow_logs_role_arn # For VPC Flow Logs access
+  ssh_security_group_id = module.vpc.ssh_security_group_id
+  allow_ssh_access      = var.allow_ssh_access
 
   # General configuration and tagging
   environment = var.environment
@@ -40,8 +42,8 @@ module "kms" {
   name_prefix    = var.name_prefix
 }
 
-# --- CloudWatch Internet Monitor Module Configuration ---
-# This module sets up the Internet Monitor if enabled, to monitor network traffic and performance.
+# --- CloudWatch Internet Monitor Module Configuration --- #
+# Configures Internet Monitor to observe network performance, if enabled
 module "internet_monitor" {
   source                  = "./modules/internet_monitor"
   enable_internet_monitor = var.enable_internet_monitor
@@ -52,8 +54,8 @@ module "internet_monitor" {
   traffic_percentage      = var.traffic_percentage
 }
 
-# --- VPC Flow Logs Module Configuration ---
-# This module configures VPC Flow Logs to capture network traffic logs and send them to CloudWatch Logs.
+# --- VPC Flow Logs Module Configuration --- #
+# Configures VPC Flow Logs for monitoring network traffic within the VPC
 module "flow_logs" {
   source             = "./modules/flow_logs"
   vpc_id             = module.vpc.vpc_id
@@ -63,8 +65,8 @@ module "flow_logs" {
   environment        = var.environment
 }
 
-# --- S3 Module Configuration ---
-# This module sets up S3 buckets for various purposes such as Terraform state storage.
+# --- S3 Module Configuration --- #
+# Sets up S3 buckets, including for Terraform state storage and other resources
 module "s3" {
   source         = "./modules/s3"
   environment    = var.environment
@@ -73,8 +75,8 @@ module "s3" {
   kms_key_arn    = module.kms.kms_key_arn
 }
 
-# --- RDS Module Configuration ---
-# This module sets up an RDS instance for the WordPress database.
+# --- RDS Module Configuration --- #
+# Configures RDS for WordPress database, specifying VPC and subnet configurations
 module "rds" {
   source      = "./modules/rds"
   name_prefix = var.name_prefix
@@ -90,11 +92,10 @@ module "rds" {
   db_name           = var.db_name
   db_port           = var.db_port
 
-  # Network configuration
-  vpc_id                = module.vpc.vpc_id
-  private_subnet_ids    = [module.vpc.private_subnet_1_id, module.vpc.private_subnet_2_id]
-  ec2_security_group_id = module.ec2.ec2_security_group_id
-  allowed_cidr_blocks   = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
+  # Network configuration for private subnets
+  vpc_id                     = module.vpc.vpc_id
+  private_subnet_ids         = [module.vpc.private_subnet_1_id, module.vpc.private_subnet_2_id]
+  private_subnet_cidr_blocks = [module.vpc.private_subnet_cidr_block_1, module.vpc.private_subnet_cidr_block_2]
 
   # Backup and replication settings
   backup_retention_period = var.backup_retention_period
@@ -108,17 +109,18 @@ module "rds" {
   kms_key_arn = module.kms.kms_key_arn
 }
 
-# --- EC2 Module Configuration ---
-# This module sets up EC2 instances for running WordPress.
+# --- EC2 Module Configuration --- #
+# Sets up EC2 instances with Auto Scaling and necessary permissions
 module "ec2" {
-  source              = "./modules/ec2"
-  ami_id              = var.ami_id
-  instance_type       = var.instance_type
-  autoscaling_desired = var.autoscaling_desired
-  autoscaling_min     = var.autoscaling_min
-  autoscaling_max     = var.autoscaling_max
-  volume_size         = var.volume_size
-  kms_key_arn         = module.kms.kms_key_arn
+  source                = "./modules/ec2"
+  ami_id                = var.ami_id
+  instance_type         = var.instance_type
+  autoscaling_desired   = var.autoscaling_desired
+  autoscaling_min       = var.autoscaling_min
+  autoscaling_max       = var.autoscaling_max
+  volume_size           = var.volume_size
+  kms_key_arn           = module.kms.kms_key_arn
+  log_retention_in_days = var.log_retention_in_days
 
   # Network configuration
   subnet_ids                = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]
@@ -126,6 +128,7 @@ module "ec2" {
   ssm_endpoint_sg_id        = module.vpc.ssm_endpoint_sg_id
   public_subnet_cidr_blocks = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
   ssh_key_name              = var.ssh_key_name
+  ssh_security_group_id     = module.vpc.ssh_security_group_id
 
   # WordPress database and Redis configuration
   db_name     = var.db_name
@@ -143,4 +146,9 @@ module "ec2" {
   # Tags and environment information
   name_prefix = var.name_prefix
   environment = var.environment
+
+  # Auto Scaling policies
+  scale_out_cpu_threshold = var.scale_out_cpu_threshold
+  scale_in_cpu_threshold  = var.scale_in_cpu_threshold
+  autoscaling_cooldown    = var.autoscaling_cooldown
 }

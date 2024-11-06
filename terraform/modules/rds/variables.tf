@@ -103,16 +103,11 @@ variable "private_subnet_ids" {
   type        = list(string)
 }
 
-variable "allowed_cidr_blocks" {
-  description = "List of CIDR blocks allowed to access RDS"
-  type        = list(string)
-}
-
 # --- Security Group Variables --- #
 
-variable "ec2_security_group_id" {
-  description = "ID of the Security Group for EC2 instances"
-  type        = string
+variable "private_subnet_cidr_blocks" {
+  description = "List of CIDR blocks for private subnets"
+  type        = list(string)
 }
 
 # --- KMS Key ARN for Encryption --- #

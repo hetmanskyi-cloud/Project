@@ -1,14 +1,16 @@
 # --- Security Group for EC2 Instances --- #
+# This Security Group manages access for EC2 instances running WordPress.
+# It allows HTTP and HTTPS access from any IP.
+# SSH access is managed via a separate Security Group.
 
-# Define a Security Group for EC2 instances to allow HTTP, HTTPS, and SSM access
 resource "aws_security_group" "ec2_sg" {
   name_prefix = "${var.name_prefix}-ec2-sg"
-  description = "Security group for EC2 instances running WordPress"
+  description = "Security Group for EC2 instances running WordPress"
   vpc_id      = var.vpc_id
 
   # --- Ingress Rules (Inbound Traffic) --- #
 
-  # Allow inbound HTTP traffic from any IP
+  # Allow inbound HTTP traffic from any IP address
   ingress {
     description = "Allow HTTP traffic from any IP address"
     from_port   = 80
@@ -17,7 +19,7 @@ resource "aws_security_group" "ec2_sg" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # Allow inbound HTTPS traffic from any IP
+  # Allow inbound HTTPS traffic from any IP address
   ingress {
     description = "Allow HTTPS traffic from any IP address"
     from_port   = 443
@@ -27,50 +29,6 @@ resource "aws_security_group" "ec2_sg" {
   }
 
   # --- Egress Rules (Outbound Traffic) --- #
-
-  # Allow outbound HTTP traffic
-  egress {
-    description = "Allow outbound HTTP traffic"
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # Allow outbound HTTPS traffic
-  egress {
-    description = "Allow outbound HTTPS traffic"
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name        = "${var.name_prefix}-ec2-sg"
-    Environment = var.environment
-  }
-}
-
-# --- Security Group for SSH Access --- #
-
-# Define a Security Group specifically for SSH access on port 22, restricted by allowed IPs
-resource "aws_security_group" "ssh_access" {
-  vpc_id      = var.vpc_id
-  description = "Security group for SSH access"
-
-  # --- Ingress Rules (Inbound Traffic) --- #
-
-  # Allow inbound SSH access from specified IP ranges
-  ingress {
-    description = "Allow SSH access from specified IP ranges"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # --- Egress Rule for SSH --- #
 
   # Allow all outbound traffic
   egress {
@@ -82,7 +40,7 @@ resource "aws_security_group" "ssh_access" {
   }
 
   tags = {
-    Name        = "${var.name_prefix}-ssh-access"
+    Name        = "${var.name_prefix}-ec2-sg"
     Environment = var.environment
   }
 }

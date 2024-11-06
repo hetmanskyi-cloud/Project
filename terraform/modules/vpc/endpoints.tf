@@ -32,9 +32,9 @@ resource "aws_security_group" "ssm_endpoint_sg" {
 
 # Define the VPC Interface Endpoint for SSM
 resource "aws_vpc_endpoint" "ssm" {
-  vpc_id            = aws_vpc.vpc.id                    # Attach to the created VPC
-  service_name      = "com.amazonaws.${var.region}.ssm" # SSM service endpoint
-  vpc_endpoint_type = "Interface"                       # Use Interface type for SSM Endpoint
+  vpc_id            = aws_vpc.vpc.id                        # Attach to the created VPC
+  service_name      = "com.amazonaws.${var.aws_region}.ssm" # SSM service endpoint
+  vpc_endpoint_type = "Interface"                           # Use Interface type for SSM Endpoint
   subnet_ids = [
     aws_subnet.private_subnet_1.id,
     aws_subnet.private_subnet_2.id # Place in private subnets only
@@ -49,9 +49,9 @@ resource "aws_vpc_endpoint" "ssm" {
 
 # Define the VPC Interface Endpoint for EC2 Messages
 resource "aws_vpc_endpoint" "ec2_messages" {
-  vpc_id            = aws_vpc.vpc.id                            # Attach to the created VPC
-  service_name      = "com.amazonaws.${var.region}.ec2messages" # EC2 Messages service endpoint
-  vpc_endpoint_type = "Interface"                               # Use Interface type for EC2 Messages
+  vpc_id            = aws_vpc.vpc.id                                # Attach to the created VPC
+  service_name      = "com.amazonaws.${var.aws_region}.ec2messages" # EC2 Messages service endpoint
+  vpc_endpoint_type = "Interface"                                   # Use Interface type for EC2 Messages
   subnet_ids = [
     aws_subnet.private_subnet_1.id,
     aws_subnet.private_subnet_2.id # Place in private subnets only
@@ -66,9 +66,9 @@ resource "aws_vpc_endpoint" "ec2_messages" {
 
 # Define the VPC Interface Endpoint for SSM Messages
 resource "aws_vpc_endpoint" "ssm_messages" {
-  vpc_id            = aws_vpc.vpc.id                            # Attach to the created VPC
-  service_name      = "com.amazonaws.${var.region}.ssmmessages" # SSM Messages service endpoint
-  vpc_endpoint_type = "Interface"                               # Use Interface type for SSM Messages
+  vpc_id            = aws_vpc.vpc.id                                # Attach to the created VPC
+  service_name      = "com.amazonaws.${var.aws_region}.ssmmessages" # SSM Messages service endpoint
+  vpc_endpoint_type = "Interface"                                   # Use Interface type for SSM Messages
   subnet_ids = [
     aws_subnet.private_subnet_1.id,
     aws_subnet.private_subnet_2.id # Place in private subnets only

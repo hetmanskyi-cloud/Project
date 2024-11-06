@@ -63,3 +63,21 @@ output "public_subnet_cidr_block_2" {
   description = "CIDR block for the second public subnet"
   value       = var.public_subnet_cidr_block_2
 }
+
+# Output the CIDR block for the first private subnet
+output "private_subnet_cidr_block_1" {
+  description = "CIDR block for the first private subnet"
+  value       = aws_subnet.private_subnet_1.cidr_block
+}
+
+# Output the CIDR block for the second private subnet
+output "private_subnet_cidr_block_2" {
+  description = "CIDR block for the second private subnet"
+  value       = aws_subnet.private_subnet_2.cidr_block
+}
+
+# Output the Security Group ID for EC2 instances
+output "ssh_security_group_id" {
+  description = "The ID of the SSH Security Group for EC2 instances"
+  value       = aws_security_group.ssh_sg.id
+}

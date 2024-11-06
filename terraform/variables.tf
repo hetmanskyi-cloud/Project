@@ -122,6 +122,11 @@ variable "ssh_key_name" {
   type        = string
 }
 
+variable "allow_ssh_access" {
+  description = "Enable or disable SSH access for EC2 instances (set to true for testing)"
+  type        = bool
+}
+
 # User data script to run on instance launch, usually deploy_wordpress.sh
 variable "user_data" {
   description = "Script to configure WordPress on instance launch (e.g., deploy_wordpress.sh)"
@@ -134,6 +139,32 @@ variable "ansible_playbook_user_data" {
   description = "Ansible playbook to configure WordPress on instance launch"
   type        = string
   default     = ""
+}
+
+# Define log retention period for CloudWatch Log Group
+variable "log_retention_in_days" {
+  description = "Number of days to retain CloudWatch logs"
+  type        = number
+}
+
+# --- Auto Scaling Scaling Policies Configuration --- #
+
+# CPU utilization threshold to scale out
+variable "scale_out_cpu_threshold" {
+  description = "CPU utilization threshold to scale out EC2 instances"
+  type        = number
+}
+
+# CPU utilization threshold to scale in
+variable "scale_in_cpu_threshold" {
+  description = "CPU utilization threshold to scale in EC2 instances"
+  type        = number
+}
+
+# Cooldown period for Auto Scaling actions
+variable "autoscaling_cooldown" {
+  description = "Cooldown period (in seconds) between Auto Scaling actions"
+  type        = number
 }
 
 # --- RDS Configuration --- #

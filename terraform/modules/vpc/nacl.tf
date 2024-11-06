@@ -1,4 +1,17 @@
-# --- Public Network ACL Configuration --- #
+# --- Network ACL Configuration --- #
+# This configuration defines the Network ACLs (NACLs) for controlling traffic in public and private subnets.
+#
+# Public NACL:
+# - Allows inbound traffic for web services (HTTP on port 80 and HTTPS on port 443).
+# - Allows inbound SSH access (port 22) for remote management.
+# - Allows all outbound traffic to simplify egress rules.
+#
+# Private NACL:
+# - Allows inbound traffic for MySQL (port 3306) and Redis (port 6379) within the VPC.
+# - Allows all outbound traffic to simplify egress rules.
+# - Restricts all other traffic to enhance security in private subnets, as per default NACL behavior.
+#
+# Each NACL is associated with the appropriate public or private subnets within the VPC.
 
 # Public NACL for controlling inbound and outbound traffic for public subnets
 resource "aws_network_acl" "public_nacl" {
@@ -12,7 +25,7 @@ resource "aws_network_acl" "public_nacl" {
 
 # --- Public NACL Rules --- #
 
-# Ingress Rules: Allow inbound traffic for HTTP, HTTPS, SSH, and ephemeral ports
+# Ingress Rules: Allow inbound traffic for HTTP, HTTPS, SSH
 
 # Rule: Allow inbound HTTP traffic on port 80
 resource "aws_network_acl_rule" "public_inbound_allow_http" {
@@ -39,10 +52,10 @@ resource "aws_network_acl_rule" "public_inbound_allow_https" {
 }
 
 # Rule: Allow inbound SSH traffic on port 22
-# This rule allows inbound SSH access on port 22 from specified IP addresses
+# This rule allows inbound SSH access on port 22 from any IP address
 resource "aws_network_acl_rule" "public_inbound_allow_ssh" {
   network_acl_id = aws_network_acl.public_nacl.id # Link to Public NACL
-  rule_number    = 200                            # Priority for the rule
+  rule_number    = 120                            # Priority for the rule
   egress         = false                          # Inbound rule
   protocol       = "tcp"                          # TCP protocol
   from_port      = 22                             # Start port for SSH
@@ -51,64 +64,16 @@ resource "aws_network_acl_rule" "public_inbound_allow_ssh" {
   rule_action    = "allow"                        # Allow traffic
 }
 
-# Egress Rules: Allow outbound traffic for HTTP, HTTPS, SSH
+# Egress Rules: Allow all outbound traffic
 
-# Rule: Allow outbound HTTP traffic on port 80
-resource "aws_network_acl_rule" "public_outbound_allow_http" {
+# Allow all outbound traffic for public NACL
+resource "aws_network_acl_rule" "public_outbound_allow_all" {
   network_acl_id = aws_network_acl.public_nacl.id
   rule_number    = 100
   egress         = true
-  protocol       = "tcp"
-  from_port      = 80
-  to_port        = 80
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "allow"
-}
-
-# Rule: Allow outbound HTTPS traffic on port 443
-resource "aws_network_acl_rule" "public_outbound_allow_https" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 110
-  egress         = true
-  protocol       = "tcp"
-  from_port      = 443
-  to_port        = 443
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "allow"
-}
-
-# Rule: Allow outbound SSH traffic on port 22
-resource "aws_network_acl_rule" "public_outbound_allow_ssh" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 200
-  egress         = true
-  protocol       = "tcp"
-  from_port      = 22
-  to_port        = 22
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "allow"
-}
-
-# Rule: Allow outbound ephemeral ports (1024-65535) for return traffic
-resource "aws_network_acl_rule" "public_outbound_allow_ephemeral" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 250
-  egress         = true
-  protocol       = "tcp"
-  from_port      = 1024
-  to_port        = 65535
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "allow"
-}
-
-# Rule: Deny all other outbound traffic to restrict unnecessary outbound connections
-resource "aws_network_acl_rule" "public_outbound_deny_all" {
-  network_acl_id = aws_network_acl.public_nacl.id
-  rule_number    = 300
-  egress         = true
   protocol       = "-1"        # All protocols
-  cidr_block     = "0.0.0.0/0" # Deny to any destination
-  rule_action    = "deny"
+  cidr_block     = "0.0.0.0/0" # Allow to all destinations
+  rule_action    = "allow"     # Allow traffic
 }
 
 # --- Private Network ACL Configuration --- #
@@ -151,40 +116,17 @@ resource "aws_network_acl_rule" "private_inbound_allow_redis" {
   rule_action    = "allow"
 }
 
-# Outbound Rules: Allow MySQL and Redis traffic within VPC
+# Outbound Rules: Allow traffic within VPC
 
-# Rule: Allow outbound MySQL traffic on port 3306 within the VPC
-resource "aws_network_acl_rule" "private_outbound_allow_mysql" {
+# Allow all outbound traffic for private NACL
+# This rule allows all outbound traffic from the private subnet to any destination
+resource "aws_network_acl_rule" "private_outbound_allow_all" {
   network_acl_id = aws_network_acl.private_nacl.id
   rule_number    = 200
   egress         = true
-  protocol       = "tcp"
-  from_port      = 3306
-  to_port        = 3306
-  cidr_block     = aws_vpc.vpc.cidr_block
-  rule_action    = "allow"
-}
-
-# Rule: Allow outbound Redis traffic on port 6379 within the VPC
-resource "aws_network_acl_rule" "private_outbound_allow_redis" {
-  network_acl_id = aws_network_acl.private_nacl.id
-  rule_number    = 210
-  egress         = true
-  protocol       = "tcp"
-  from_port      = 6379
-  to_port        = 6379
-  cidr_block     = aws_vpc.vpc.cidr_block
-  rule_action    = "allow"
-}
-
-# Rule: Deny all other outbound traffic to ensure only necessary traffic is allowed
-resource "aws_network_acl_rule" "private_outbound_deny_all" {
-  network_acl_id = aws_network_acl.private_nacl.id
-  rule_number    = 220
-  egress         = true
-  protocol       = "-1"
-  cidr_block     = "0.0.0.0/0"
-  rule_action    = "deny"
+  protocol       = "-1"        # All protocols
+  cidr_block     = "0.0.0.0/0" # Allow to all destinations
+  rule_action    = "allow"     # Allow traffic
 }
 
 # --- NACL Associations --- #

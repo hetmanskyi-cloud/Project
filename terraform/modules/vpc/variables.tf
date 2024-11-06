@@ -1,12 +1,17 @@
 # --- AWS Region Configuration --- #
 
 # AWS region where the resources will be created
-variable "region" {
+variable "aws_region" {
   description = "The AWS region where the resources are being deployed"
   type        = string
 }
 
 # --- VPC CIDR Block Configuration --- #
+
+variable "vpc_id" {
+  description = "The ID of the VPC"
+  type        = string
+}
 
 # Define the CIDR block for the VPC
 variable "vpc_cidr_block" {
@@ -97,7 +102,19 @@ variable "environment" {
 }
 
 variable "flow_logs_role_arn" {
-  description = "IAM Role ARN for VPC Flow Logs"
+  description = "IAM Role ARN for VPC Flow Logs, used only if additional permissions are required for VPC Flow Logs"
   type        = string
   default     = null
+}
+
+# Security Group ID for SSH access
+variable "ssh_security_group_id" {
+  description = "ID of the Security Group for SSH access"
+  type        = string
+}
+
+# Control SSH access for testing purposes
+variable "allow_ssh_access" {
+  description = "Whether to allow SSH access to EC2 instances for testing purposes"
+  type        = bool
 }
