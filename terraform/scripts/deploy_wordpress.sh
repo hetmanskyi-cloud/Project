@@ -82,7 +82,12 @@ EOL
 # Enable Nginx configuration and restart service
 echo "Enabling Nginx configuration and restarting the service..." | tee -a "$LOG_FILE"
 sudo ln -sf /etc/nginx/sites-available/wordpress /etc/nginx/sites-enabled/
-sudo nginx -t && sudo systemctl restart nginx || { echo "Failed to restart Nginx. Check configuration." | tee -a "$LOG_FILE"; exit 1; }
+if sudo nginx -t; then
+  sudo systemctl restart nginx
+else
+  echo "Failed to restart Nginx. Check configuration." | tee -a "$LOG_FILE"
+  exit 1
+fi
 
 # --- Enable Nginx and PHP-FPM to start on boot ---
 echo "Enabling Nginx and PHP-FPM to start on boot..." | tee -a "$LOG_FILE"
