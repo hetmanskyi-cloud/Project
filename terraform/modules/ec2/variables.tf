@@ -66,7 +66,7 @@ variable "autoscaling_max" {
   type        = number
 }
 
-# --- Auto Scaling Scaling Policies Configuration ---
+# --- Auto Scaling Scaling Policies Configuration --- #
 
 # CPU utilization threshold to scale out
 variable "scale_out_cpu_threshold" {
@@ -119,16 +119,13 @@ variable "db_port" {
   default     = 3306
 }
 
+# --- User Data Script for EC2 Configuration --- #
+
+# Bash script or Ansible playbook used for initial setup and configuration of EC2 instances
 variable "user_data" {
-  description = "Path to the user data script for EC2"
+  description = "Script to configure WordPress on instance launch (e.g., deploy_wordpress.sh)"
   type        = string
   default     = ""
-}
-
-variable "ansible_playbook_user_data" {
-  description = "Path to the Ansible playbook user data script to be executed on instance launch"
-  type        = string
-  default     = "" # Set the path to the Ansible playbook if required
 }
 
 # --- Redis Configuration for WordPress Cache --- #
@@ -154,12 +151,14 @@ variable "ssm_endpoint_sg_id" {
   type        = string
 }
 
+# Security Group ID for SSH access to EC2 instances
 variable "ssh_security_group_id" {
   description = "ID of the SSH Security Group for EC2 instances"
   type        = string
 }
 
 # --- KMS Key ARN for CloudWatch Logs Encryption --- #
+
 # Specifies the ARN of the KMS key used to encrypt CloudWatch logs
 variable "kms_key_arn" {
   description = "ARN of the KMS key for encrypting CloudWatch logs"
@@ -167,18 +166,23 @@ variable "kms_key_arn" {
 }
 
 # --- Public Subnet CIDR Blocks --- #
+
+# Defines CIDR blocks for public subnets, used in security group rules
 variable "public_subnet_cidr_blocks" {
   description = "List of CIDR blocks for the public subnets. Can be used for controlling allowed IP ranges in ALB Security Group or other access configurations."
   type        = list(string)
 }
 
-# SSH Key Pair Name
+# --- SSH Key Pair Name --- #
+
+# Name of the SSH key used for secure access to EC2 instances
 variable "ssh_key_name" {
   description = "The name of the SSH key pair to access EC2 instances"
   type        = string
 }
 
 # --- CloudWatch Log Group --- #
+# Configuration settings for CloudWatch log retention
 
 # Define log retention period for CloudWatch Log Group
 variable "log_retention_in_days" {

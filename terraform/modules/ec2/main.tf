@@ -13,9 +13,9 @@ resource "aws_launch_template" "ec2" {
   }
 
   # User data for EC2 instance setup
-  user_data = base64encode(file("${path.root}/scripts/deploy_wordpress.sh"))
+  user_data = var.user_data
   # Ansible playbook (Uncomment this line if you prefer to use Ansible):
-  # user_data = base64encode(file("${path.root}/scripts/playbook_wordpress_install.yml"))
+  # user_data = var.user_data
 
   # Configure Instance Metadata Service to require tokens
   metadata_options {

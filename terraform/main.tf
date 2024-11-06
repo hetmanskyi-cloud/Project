@@ -138,10 +138,10 @@ module "ec2" {
   db_port     = var.db_port
   redis_host  = var.redis_host
   redis_port  = var.redis_port
-  user_data   = file("${path.root}/scripts/deploy_wordpress.sh")
+  user_data   = base64encode(file("${path.root}/scripts/deploy_wordpress.sh"))
 
   # Ansible playbook (Uncomment this line if you prefer to use Ansible):
-  # user_data = file("${path.root}/scripts/playbook_wordpress_install.yml")
+  # user_data = base64encode(file("${path.root}/scripts/playbook_wordpress_install.yml"))
 
   # Tags and environment information
   name_prefix = var.name_prefix
