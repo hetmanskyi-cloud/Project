@@ -55,13 +55,13 @@ output "ssm_endpoint_sg_id" {
 # Output the CIDR block for the first public subnet
 output "public_subnet_cidr_block_1" {
   description = "CIDR block for the first public subnet"
-  value       = var.public_subnet_cidr_block_1
+  value       = aws_subnet.public_subnet_1.cidr_block
 }
 
 # Output the CIDR block for the second public subnet
 output "public_subnet_cidr_block_2" {
   description = "CIDR block for the second public subnet"
-  value       = var.public_subnet_cidr_block_2
+  value       = aws_subnet.public_subnet_2.cidr_block
 }
 
 # Output the CIDR block for the first private subnet

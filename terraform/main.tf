@@ -19,7 +19,6 @@ module "vpc" {
   # AWS-specific configurations
   aws_region     = var.aws_region
   aws_account_id = var.aws_account_id
-  vpc_id         = module.vpc.vpc_id
 
   # Security and monitoring settings
   kms_key_arn           = module.kms.kms_key_arn              # For encryption of CloudWatch Logs
@@ -124,11 +123,11 @@ module "ec2" {
 
   # Network configuration
   subnet_ids                = [module.vpc.public_subnet_1_id, module.vpc.public_subnet_2_id]
-  vpc_id                    = module.vpc.vpc_id
   ssm_endpoint_sg_id        = module.vpc.ssm_endpoint_sg_id
   public_subnet_cidr_blocks = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
   ssh_key_name              = var.ssh_key_name
   ssh_security_group_id     = module.vpc.ssh_security_group_id
+  vpc_id                    = module.vpc.vpc_id
 
   # WordPress database and Redis configuration
   db_name     = var.db_name

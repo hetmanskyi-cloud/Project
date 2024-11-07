@@ -6,7 +6,7 @@
 resource "aws_security_group" "ec2_sg" {
   name_prefix = "${var.name_prefix}-ec2-sg"
   description = "Security Group for EC2 instances running WordPress"
-  vpc_id      = var.vpc_id
+  vpc_id      = var.vpc_id # Associate with the specified VPC
 
   # --- Ingress Rules (Inbound Traffic) --- #
 

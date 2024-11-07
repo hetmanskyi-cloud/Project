@@ -5,7 +5,7 @@
 resource "aws_security_group" "ssh_sg" {
   name_prefix = "${var.name_prefix}-ssh-sg"
   description = "Security Group for SSH access to EC2 instances"
-  vpc_id      = var.vpc_id
+  vpc_id      = aws_vpc.vpc.id
 
   # --- Ingress Rules (Inbound Traffic) --- #
 

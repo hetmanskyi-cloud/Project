@@ -12,14 +12,6 @@ variable "environment" {
   type        = string
 }
 
-# --- VPC and Instance Configuration --- #
-
-# VPC ID to associate with the EC2 instances
-variable "vpc_id" {
-  description = "The ID of the VPC where EC2 instances will be launched"
-  type        = string
-}
-
 # AMI ID for the EC2 instances
 variable "ami_id" {
   description = "The AMI ID to use for EC2 instances"
@@ -30,6 +22,11 @@ variable "ami_id" {
 variable "volume_size" {
   description = "The size of the root EBS volume in GB"
   type        = number
+}
+
+variable "vpc_id" {
+  description = "The ID of the VPC to associate with the EC2 Security Group"
+  type        = string
 }
 
 # --- Subnet Configuration --- #
