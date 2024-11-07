@@ -10,15 +10,6 @@ resource "aws_internet_gateway" "igw" {
   }
 }
 
-# --- Main Route for VPC --- #
-
-# Define a route in the VPC's main route table to enable internet access
-resource "aws_route" "main_route" {
-  route_table_id         = aws_vpc.vpc.main_route_table_id # Main route table ID of the VPC
-  destination_cidr_block = "0.0.0.0/0"                     # Direct all outbound internet traffic
-  gateway_id             = aws_internet_gateway.igw.id     # Use the Internet Gateway for this route
-}
-
 # --- Public Route Table and Association --- #
 
 # Define the public route table for routing internet-bound traffic in public subnets
