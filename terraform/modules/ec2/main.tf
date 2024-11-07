@@ -19,7 +19,9 @@ resource "aws_launch_template" "ec2" {
 
   # Configure Instance Metadata Service to require tokens
   metadata_options {
-    http_tokens = "required" # Ensures only requests with a valid token can access metadata
+    http_tokens                 = "required" # Ensures only requests with a valid token can access metadata
+    http_put_response_hop_limit = 2          # Limit the number of allowed HTTP put response hops
+    http_endpoint               = "enabled"  # Enable HTTP access to metadata endpoint (default setting)
   }
 
   # Network interfaces configuration
