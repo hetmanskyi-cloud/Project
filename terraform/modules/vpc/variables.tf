@@ -99,15 +99,3 @@ variable "flow_logs_role_arn" {
   type        = string
   default     = null
 }
-
-# Security Group ID for SSH access
-variable "ssh_security_group_id" {
-  description = "ID of the Security Group for SSH access"
-  type        = string
-}
-
-# Control SSH access for testing purposes
-variable "allow_ssh_access" {
-  description = "Whether to allow SSH access to EC2 instances for testing purposes"
-  type        = bool
-}

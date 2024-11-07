@@ -3,11 +3,10 @@
 #
 # Public NACL:
 # - Allows inbound traffic for web services (HTTP on port 80 and HTTPS on port 443).
-# - Allows inbound SSH access (port 22) for remote management.
 # - Allows all outbound traffic to simplify egress rules.
 #
 # Private NACL:
-# - Allows inbound traffic for MySQL (port 3306) and Redis (port 6379) within the VPC.
+# - Allows inbound traffic for MySQL (port 3306) within the VPC.
 # - Allows all outbound traffic to simplify egress rules.
 # - Restricts all other traffic to enhance security in private subnets, as per default NACL behavior.
 #
@@ -25,7 +24,7 @@ resource "aws_network_acl" "public_nacl" {
 
 # --- Public NACL Rules --- #
 
-# Ingress Rules: Allow inbound traffic for HTTP, HTTPS, SSH
+# Ingress Rules: Allow inbound traffic for HTTP, HTTPS
 
 # Rule: Allow inbound HTTP traffic on port 80
 resource "aws_network_acl_rule" "public_inbound_allow_http" {
@@ -49,19 +48,6 @@ resource "aws_network_acl_rule" "public_inbound_allow_https" {
   to_port        = 443
   cidr_block     = "0.0.0.0/0"
   rule_action    = "allow"
-}
-
-# Rule: Allow inbound SSH traffic on port 22
-# This rule allows inbound SSH access on port 22 from any IP address
-resource "aws_network_acl_rule" "public_inbound_allow_ssh" {
-  network_acl_id = aws_network_acl.public_nacl.id # Link to Public NACL
-  rule_number    = 120                            # Priority for the rule
-  egress         = false                          # Inbound rule
-  protocol       = "tcp"                          # TCP protocol
-  from_port      = 22                             # Start port for SSH
-  to_port        = 22                             # End port for SSH
-  cidr_block     = "0.0.0.0/0"                    # Allowed CIDR for SSH access
-  rule_action    = "allow"                        # Allow traffic
 }
 
 # Egress Rules: Allow all outbound traffic

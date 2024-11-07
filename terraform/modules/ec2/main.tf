@@ -28,7 +28,6 @@ resource "aws_launch_template" "ec2" {
     delete_on_termination       = true # Remove network interface on termination
     security_groups = [
       aws_security_group.ec2_sg.id, # SG for HTTP/HTTPS access
-      var.ssh_security_group_id,    # SG for SSH access
       var.ssm_endpoint_sg_id        # SG for SSM access
     ]
   }

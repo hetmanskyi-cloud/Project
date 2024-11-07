@@ -1,7 +1,7 @@
 # --- Security Group for EC2 Instances --- #
 # This Security Group manages access for EC2 instances running WordPress.
 # It allows HTTP and HTTPS access from any IP.
-# SSH access is managed via a separate Security Group.
+# SSH access can be managed through an optional rule controlled by a variable.
 
 resource "aws_security_group" "ec2_sg" {
   name_prefix = "${var.name_prefix}-ec2-sg"
@@ -26,6 +26,18 @@ resource "aws_security_group" "ec2_sg" {
     to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Allow SSH access if enabled
+  dynamic "ingress" {
+    for_each = var.allow_ssh_access ? [1] : []
+    content {
+      description = "Allow SSH access for management purposes"
+      from_port   = 22
+      to_port     = 22
+      protocol    = "tcp"
+      cidr_blocks = ["0.0.0.0/0"]
+    }
   }
 
   # --- Egress Rules (Outbound Traffic) --- #

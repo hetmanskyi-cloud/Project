@@ -133,12 +133,6 @@ variable "ssm_endpoint_sg_id" {
   type        = string
 }
 
-# Security Group ID for SSH access to EC2 instances
-variable "ssh_security_group_id" {
-  description = "ID of the SSH Security Group for EC2 instances"
-  type        = string
-}
-
 # --- KMS Key ARN for CloudWatch Logs Encryption --- #
 
 # Specifies the ARN of the KMS key used to encrypt CloudWatch logs
@@ -170,4 +164,10 @@ variable "ssh_key_name" {
 variable "log_retention_in_days" {
   description = "Number of days to retain CloudWatch logs"
   type        = number
+}
+
+# Control SSH access for testing purposes
+variable "allow_ssh_access" {
+  description = "Whether to allow SSH access to EC2 instances for testing purposes"
+  type        = bool
 }

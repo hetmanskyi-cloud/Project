@@ -11,7 +11,7 @@ echo "Starting WordPress installation..."
 
 echo "Updating system and installing required packages..."
 sudo apt update && sudo apt upgrade -y && sleep 2
-sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl php-redis unzip || {
+sudo apt install -y nginx mysql-client php-fpm php-mysql php-xml php-mbstring php-curl unzip || {
   echo "Package installation failed. Please check the connection and package availability."
   exit 1
 }
@@ -32,15 +32,12 @@ sudo chmod -R 750 /var/www/html/wordpress
 # Copy default WordPress config
 sudo cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php || { echo "Failed to copy WordPress config file."; exit 1; }
 
-# --- Set environment variables for database and Redis --- #
+# --- Set environment variables for database --- #
 
 DB_NAME="${DB_NAME:-default_db_name}"
 DB_USER="${DB_USER:-default_db_user}"
 DB_PASSWORD="${DB_PASSWORD:-default_db_password}"
 DB_HOST="${DB_HOST:-default_rds_host_endpoint}"
-
-REDIS_HOST="${REDIS_HOST:-default_redis_host}"
-REDIS_PORT="${REDIS_PORT:-6379}"
 
 # Configure wp-config.php for database connection
 echo "Configuring wp-config.php for database connection..."
@@ -48,15 +45,6 @@ sudo sed -i "s/database_name_here/$DB_NAME/" /var/www/html/wordpress/wp-config.p
 sudo sed -i "s/username_here/$DB_USER/" /var/www/html/wordpress/wp-config.php
 sudo sed -i "s/password_here/$DB_PASSWORD/" /var/www/html/wordpress/wp-config.php
 sudo sed -i "s/localhost/$DB_HOST/" /var/www/html/wordpress/wp-config.php
-
-# Add Redis configuration to wp-config.php
-echo "Adding Redis configuration to wp-config.php..."
-sudo tee -a /var/www/html/wordpress/wp-config.php > /dev/null <<EOL
-# Redis configuration
-define('WP_REDIS_HOST', '$REDIS_HOST');
-define('WP_REDIS_PORT', $REDIS_PORT);
-define('WP_CACHE', true);
-EOL
 
 # Set secure permissions for wp-config.php
 sudo chmod 640 /var/www/html/wordpress/wp-config.php

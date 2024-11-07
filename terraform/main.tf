@@ -21,10 +21,8 @@ module "vpc" {
   aws_account_id = var.aws_account_id
 
   # Security and monitoring settings
-  kms_key_arn           = module.kms.kms_key_arn              # For encryption of CloudWatch Logs
-  flow_logs_role_arn    = module.flow_logs.flow_logs_role_arn # For VPC Flow Logs access
-  ssh_security_group_id = module.vpc.ssh_security_group_id
-  allow_ssh_access      = var.allow_ssh_access
+  kms_key_arn        = module.kms.kms_key_arn              # For encryption of CloudWatch Logs
+  flow_logs_role_arn = module.flow_logs.flow_logs_role_arn # For VPC Flow Logs access
 
   # General configuration and tagging
   environment = var.environment
@@ -126,7 +124,7 @@ module "ec2" {
   ssm_endpoint_sg_id        = module.vpc.ssm_endpoint_sg_id
   public_subnet_cidr_blocks = [module.vpc.public_subnet_cidr_block_1, module.vpc.public_subnet_cidr_block_2]
   ssh_key_name              = var.ssh_key_name
-  ssh_security_group_id     = module.vpc.ssh_security_group_id
+  allow_ssh_access          = var.allow_ssh_access
   vpc_id                    = module.vpc.vpc_id
 
   # WordPress database and Redis configuration
