@@ -260,17 +260,3 @@ variable "enable_monitoring" {
   type        = bool
   default     = false
 }
-
-# --- Redis Configuration --- #
-
-# Redis host endpoint for WordPress caching
-variable "redis_host" {
-  description = "Redis host endpoint for WordPress caching"
-  type        = string
-}
-
-# Redis port for caching
-variable "redis_port" {
-  description = "Redis port for caching"
-  type        = number
-}

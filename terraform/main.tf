@@ -135,8 +135,6 @@ module "ec2" {
   db_password = var.db_password
   db_host     = module.rds.db_endpoint
   db_port     = var.db_port
-  redis_host  = var.redis_host
-  redis_port  = var.redis_port
   user_data   = base64encode(file("${path.root}/scripts/deploy_wordpress.sh"))
 
   # Ansible playbook (Uncomment this line if you prefer to use Ansible):

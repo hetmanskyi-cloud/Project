@@ -125,21 +125,6 @@ variable "user_data" {
   default     = ""
 }
 
-# --- Redis Configuration for WordPress Cache --- #
-
-# Redis host endpoint for WordPress cache
-variable "redis_host" {
-  description = "Redis host endpoint for WordPress cache"
-  type        = string
-}
-
-# Redis port for WordPress cache
-variable "redis_port" {
-  description = "Redis port for WordPress cache"
-  type        = number
-  default     = 6379
-}
-
 # --- Security Configuration --- #
 
 # Security Group ID for SSM endpoint

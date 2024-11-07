@@ -104,18 +104,6 @@ resource "aws_network_acl_rule" "private_inbound_allow_mysql" {
   rule_action    = "allow"
 }
 
-# Rule: Allow inbound Redis traffic on port 6379 within the VPC
-resource "aws_network_acl_rule" "private_inbound_allow_redis" {
-  network_acl_id = aws_network_acl.private_nacl.id
-  rule_number    = 210
-  egress         = false
-  protocol       = "tcp"
-  from_port      = 6379
-  to_port        = 6379
-  cidr_block     = aws_vpc.vpc.cidr_block
-  rule_action    = "allow"
-}
-
 # Outbound Rules: Allow traffic within VPC
 
 # Allow all outbound traffic for private NACL
